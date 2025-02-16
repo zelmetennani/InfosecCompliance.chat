@@ -9,6 +9,9 @@
     <meta property="og:type" content="website">
     <title>Infosec Compliance Chat - AI Compliance Assistant</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Add Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 </head>
 <body>
     <main class="container">
@@ -22,7 +25,19 @@
             <h2>Join the Waitlist</h2>
             <p>Be among the first to experience the future of compliance guidance.</p>
             
-            <form id="waitlistForm" class="signup-form">
+            <div class="auth-buttons">
+                <form id="signInForm" class="signup-form">
+                    <div class="form-group">
+                        <input type="email" id="signInEmail" name="email" placeholder="Email" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="signInPassword" name="password" placeholder="Password" required>
+                    </div>
+                    <button type="submit" class="cta-button">Sign In</button>
+                </form>
+            </div>
+
+            <form id="waitlistForm" class="signup-form hidden">
                 <div class="form-group">
                     <input type="text" id="name" name="name" placeholder="Your Name" required>
                 </div>
@@ -41,6 +56,7 @@
             <p>©<script>document.write(new Date().getFullYear());</script> Infosec Compliance Chat. All rights reserved.</p>
         </footer>
     </main>
+    <script src="config.js"></script>
     <script src="script.js"></script>
 </body>
 </html> 
