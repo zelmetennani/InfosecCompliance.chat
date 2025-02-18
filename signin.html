@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sign in to Infosec Compliance Chat">
+    <title>Sign In - Infosec Compliance Chat</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">Infosec Compliance Chat</div>
+            <div class="nav-links">
+                <a href="signin.html" class="nav-link">Sign In</a>
+                <a href="signup.html" class="cta-button-small">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <header>
+            <h1 class="fade-in">Welcome Back</h1>
+            <p class="subtitle fade-in">Sign in to continue to Infosec Compliance Chat</p>
+        </header>
+
+        <section class="auth-section fade-in">
+            <form id="signInForm" class="signup-form">
+                <div class="form-group">
+                    <input type="email" id="signInEmail" name="email" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="signInPassword" name="password" placeholder="Password" required>
+                </div>
+                <button type="submit" class="cta-button">Sign In</button>
+                <p class="form-footer">
+                    Need an account? <a href="signup.html">Sign up</a>
+                </p>
+            </form>
+        </section>
+
+        <footer>
+            <p>©<script>document.write(new Date().getFullYear());</script> Infosec Compliance Chat. All rights reserved.</p>
+        </footer>
+    </main>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+      import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs",
+        authDomain: "infoseccompliance-chat.firebaseapp.com",
+        projectId: "infoseccompliance-chat",
+        storageBucket: "infoseccompliance-chat.appspot.com",
+        messagingSenderId: "85538751648",
+        appId: "1:85538751648:web:f1a594d9b4d7dfaf9775c5"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+
+      document.getElementById('signInForm').addEventListener('submit', function(event) {
+          event.preventDefault();
+          const email = document.getElementById('signInEmail').value;
+          const password = document.getElementById('signInPassword').value;
+
+          signInWithEmailAndPassword(auth, email, password)
+              .then((userCredential) => {
+                  window.location.href = "https://app.infoseccompliance.chat";
+              })
+              .catch((error) => {
+                  console.error("Error signing in:", error);
+                  alert("Error signing in: " + error.message);
+              });
+      });
+    </script>
+</body>
+</html> 

@@ -3,60 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="AI-powered compliance insights and guidance for your organization. Join the waitlist today.">
+    <meta name="description" content="AI-powered compliance insights and guidance for your organization">
     <meta property="og:title" content="Infosec Compliance Chat - AI-Powered Compliance Insights">
-    <meta property="og:description" content="Get instant compliance guidance powered by AI. Join the waitlist for early access.">
+    <meta property="og:description" content="Get instant compliance guidance powered by AI. Navigate complex regulatory requirements with confidence.">
     <meta property="og:type" content="website">
     <title>Infosec Compliance Chat - AI Compliance Assistant</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Add Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 </head>
 <body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="logo">Infosec Compliance Chat</div>
+            <div class="nav-links">
+                <a href="signin.html" class="nav-link">Sign In</a>
+                <a href="signup.html" class="cta-button-small">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
     <main class="container">
-        <header>
-            <h1 class="fade-in">AI-Powered Compliance Insights at Your Fingertips</h1>
-            <p class="subtitle fade-in">Get instant answers to your compliance questions using advanced AI. 
+        <section class="hero fade-in">
+            <h1>AI-Powered Compliance Insights at Your Fingertips</h1>
+            <p class="subtitle">Get instant answers to your compliance questions using advanced AI. 
                Navigate complex regulatory requirements with confidence and efficiency.</p>
-        </header>
-
-        <section class="waitlist-section fade-in">
-            <h2>Join the Waitlist</h2>
-            <p>Be among the first to experience the future of compliance guidance.</p>
-            
-            <div class="auth-buttons">
-                <form id="signInForm" class="signup-form">
-                    <div class="form-group">
-                        <input type="email" id="signInEmail" name="email" placeholder="Email" required>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" id="signInPassword" name="password" placeholder="Password" required>
-                    </div>
-                    <button type="submit" class="cta-button">Sign In</button>
-                </form>
+            <div class="hero-buttons">
+                <a href="signup.html" class="cta-button">Start Free Trial</a>
+                <a href="#features" class="secondary-button">Learn More</a>
             </div>
+        </section>
 
-            <form id="waitlistForm" class="signup-form hidden">
-                <div class="form-group">
-                    <input type="text" id="name" name="name" placeholder="Your Name" required>
+        <section id="features" class="features-section">
+            <h2>Key Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>Instant Compliance Guidance</h3>
+                    <p>Get immediate answers to your compliance questions, powered by advanced AI technology.</p>
                 </div>
-                <div class="form-group">
-                    <input type="email" id="email" name="email" placeholder="Your Email" required>
+                <div class="feature-card">
+                    <h3>Framework Coverage</h3>
+                    <p>Comprehensive support for major compliance frameworks including SOC 2, HIPAA, and more.</p>
                 </div>
-                <button type="submit" class="cta-button">Join Waitlist</button>
-            </form>
-
-            <div id="confirmationMessage" class="hidden">
-                Thanks for joining! We'll keep you updated on our launch.
+                <div class="feature-card">
+                    <h3>Context-Aware Responses</h3>
+                    <p>Receive guidance tailored to your organization's specific compliance needs and context.</p>
+                </div>
             </div>
+        </section>
+
+        <section class="cta-section">
+            <h2>Ready to Transform Your Compliance Process?</h2>
+            <p>Join organizations already using Infosec Compliance Chat to streamline their compliance efforts.</p>
+            <a href="signup.html" class="cta-button">Get Started Now</a>
         </section>
 
         <footer>
             <p>©<script>document.write(new Date().getFullYear());</script> Infosec Compliance Chat. All rights reserved.</p>
         </footer>
     </main>
-    <script src="config.js"></script>
-    <script src="script.js"></script>
 </body>
 </html> 
