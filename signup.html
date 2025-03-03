@@ -36,12 +36,19 @@
                 </div>
                 <button type="submit" class="cta-button">Create Account</button>
                 <p class="form-footer">
-                    Already have an account? <a href="index.html">Sign in</a>
+                    Already have an account? <a href="signin.html">Sign in</a>
                 </p>
             </form>
 
-            <div id="successMessage" class="hidden">
-                Account created successfully! <a href="index.html">Sign in</a> to continue.
+            <!-- Success notification popup -->
+            <div id="successPopup" class="notification-popup">
+                <div class="notification-content">
+                    <span class="close-button">&times;</span>
+                    <div class="success-icon">✓</div>
+                    <h3>Account Created!</h3>
+                    <p>Your account has been successfully created.</p>
+                    <a href="signin.html" class="cta-button">Sign In Now</a>
+                </div>
             </div>
         </section>
 
@@ -67,12 +74,21 @@
 
           createUserWithEmailAndPassword(auth, email, password)
               .then((userCredential) => {
-                  document.getElementById('successMessage').classList.remove('hidden');
+                  // Show success popup
+                  document.getElementById('successPopup').style.display = 'flex';
+                  
+                  // Clear the form
+                  document.getElementById('signUpForm').reset();
               })
               .catch((error) => {
                   console.error("Error signing up:", error);
                   alert("Error signing up: " + error.message);
               });
+      });
+      
+      // Close button functionality
+      document.querySelector('.close-button').addEventListener('click', function() {
+          document.getElementById('successPopup').style.display = 'none';
       });
     </script>
 </body>
