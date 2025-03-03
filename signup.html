@@ -63,14 +63,25 @@
       import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
       import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-      // Initialize Firebase using the config from config.js
-      const app = initializeApp(window.firebaseConfig);
-      const auth = getAuth(app);
+      let app, auth;
+      
+      // Initialize Firebase when config is ready
+      document.addEventListener('firebaseConfigReady', function() {
+          console.log("Initializing Firebase with config:", window.firebaseConfig);
+          app = initializeApp(window.firebaseConfig);
+          auth = getAuth(app);
+      });
 
       document.getElementById('signUpForm').addEventListener('submit', function(event) {
           event.preventDefault();
           const email = document.getElementById('signUpEmail').value;
           const password = document.getElementById('signUpPassword').value;
+
+          if (!auth) {
+              console.error("Firebase auth not initialized yet");
+              alert("Error: Firebase not initialized. Please try again in a moment.");
+              return;
+          }
 
           createUserWithEmailAndPassword(auth, email, password)
               .then((userCredential) => {

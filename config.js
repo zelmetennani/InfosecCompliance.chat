@@ -1,8 +1,15 @@
 // Load environment variables from .env file in development
 if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    console.log("Running in development mode, attempting to load .env file");
     fetch('/.env')
-        .then(response => response.text())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to load .env file: ${response.status}`);
+            }
+            return response.text();
+        })
         .then(text => {
+            console.log("Successfully loaded .env file");
             const envVars = text.split('\n').reduce((acc, line) => {
                 const [key, value] = line.split('=');
                 if (key && value) {
@@ -20,10 +27,23 @@ if (window.location.hostname === 'localhost' || window.location.hostname === '12
                 appId: envVars.FIREBASE_APP_ID,
                 measurementId: envVars.FIREBASE_MEASUREMENT_ID
             };
+            
+            console.log("Firebase config loaded:", window.firebaseConfig);
+            
+            // Initialize Firebase after config is loaded
+            initializeFirebase();
         })
-        .catch(error => console.error('Error loading .env file:', error));
+        .catch(error => {
+            console.error('Error loading .env file:', error);
+            // Fall back to production config
+            useProductionConfig();
+        });
 } else {
-    // For production environment
+    console.log("Running in production mode");
+    useProductionConfig();
+}
+
+function useProductionConfig() {
     window.firebaseConfig = {
         apiKey: "FIREBASE_API_KEY",
         authDomain: "FIREBASE_AUTH_DOMAIN",
@@ -33,6 +53,16 @@ if (window.location.hostname === 'localhost' || window.location.hostname === '12
         appId: "FIREBASE_APP_ID",
         measurementId: "FIREBASE_MEASUREMENT_ID"
     };
+    console.log("Using production config:", window.firebaseConfig);
+    
+    // Initialize Firebase after config is loaded
+    initializeFirebase();
+}
+
+// This function will be called after config is loaded
+function initializeFirebase() {
+    // We'll initialize Firebase in the individual pages
+    document.dispatchEvent(new Event('firebaseConfigReady'));
 }
 
 const firebaseConfig = {
