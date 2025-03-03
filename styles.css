@@ -389,4 +389,28 @@ input[type="password"]:focus {
 .notification-content .cta-button {
     display: inline-block;
     margin-top: 10px;
+}
+
+.password-container {
+    position: relative;
+    display: flex;
+}
+
+.password-input {
+    flex: 1;
+    padding-right: 70px;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    background: #f0f0f0;
+    border: 1px solid #e5e7eb;
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+    cursor: pointer;
+    padding: 0 10px;
+    font-size: 0.875rem;
 } 
