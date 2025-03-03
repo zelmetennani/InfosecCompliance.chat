@@ -31,7 +31,7 @@
                 </div>
                 <div class="form-group">
                     <input type="password" id="signUpPassword" name="password" 
-                           placeholder="Password" required minlength="6">
+                           placeholder="Password" required minlength="6" autocomplete="new-password">
                     <p class="help-text">Password must be at least 6 characters</p>
                 </div>
                 <button type="submit" class="cta-button">Create Account</button>
@@ -153,6 +153,22 @@
         } else {
           console.error("Firebase API key is missing!");
         }
+      });
+    </script>
+
+    <!-- Add this at the bottom of your script section -->
+    <script>
+      document.getElementById('signUpPassword').addEventListener('input', function(event) {
+          console.log('Password input event fired');
+      });
+
+      document.getElementById('signUpPassword').addEventListener('keydown', function(event) {
+          console.log('Password keydown event fired, key:', event.key);
+      });
+
+      // Check for any errors that might be preventing input
+      window.addEventListener('error', function(event) {
+          console.error('Global error caught:', event.error);
       });
     </script>
 </body>
