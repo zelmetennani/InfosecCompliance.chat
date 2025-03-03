@@ -136,5 +136,24 @@
           document.getElementById('successPopup').style.display = 'none';
       });
     </script>
+
+    <script>
+      // Debug: Check if Firebase config is properly set
+      window.addEventListener('DOMContentLoaded', function() {
+        console.log("Current Firebase config:", window.firebaseConfig);
+        
+        // Check if API key looks valid
+        if (window.firebaseConfig && window.firebaseConfig.apiKey) {
+          if (window.firebaseConfig.apiKey.includes("FIREBASE_API_KEY") || 
+              window.firebaseConfig.apiKey.includes("##FIREBASE_API_KEY##")) {
+            console.error("Firebase API key placeholder not replaced!");
+          } else {
+            console.log("Firebase API key appears to be set correctly");
+          }
+        } else {
+          console.error("Firebase API key is missing!");
+        }
+      });
+    </script>
 </body>
 </html> 
