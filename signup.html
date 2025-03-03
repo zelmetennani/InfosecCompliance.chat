@@ -64,25 +64,59 @@
       import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
       let app, auth;
+      let firebaseInitialized = false;
       
       // Initialize Firebase when config is ready
       document.addEventListener('firebaseConfigReady', function() {
           console.log("Initializing Firebase with config:", window.firebaseConfig);
-          app = initializeApp(window.firebaseConfig);
-          auth = getAuth(app);
+          try {
+              app = initializeApp(window.firebaseConfig);
+              auth = getAuth(app);
+              firebaseInitialized = true;
+              console.log("Firebase successfully initialized");
+          } catch (error) {
+              console.error("Error initializing Firebase:", error);
+          }
       });
+
+      // Fallback initialization after a delay if the event doesn't fire
+      setTimeout(() => {
+          if (!firebaseInitialized && window.firebaseConfig) {
+              console.log("Fallback: Initializing Firebase with config:", window.firebaseConfig);
+              try {
+                  app = initializeApp(window.firebaseConfig);
+                  auth = getAuth(app);
+                  firebaseInitialized = true;
+                  console.log("Firebase successfully initialized (fallback)");
+              } catch (error) {
+                  console.error("Error initializing Firebase (fallback):", error);
+              }
+          }
+      }, 2000);
 
       document.getElementById('signUpForm').addEventListener('submit', function(event) {
           event.preventDefault();
           const email = document.getElementById('signUpEmail').value;
           const password = document.getElementById('signUpPassword').value;
 
-          if (!auth) {
-              console.error("Firebase auth not initialized yet");
-              alert("Error: Firebase not initialized. Please try again in a moment.");
-              return;
+          // Wait for Firebase to initialize if it hasn't already
+          if (!firebaseInitialized) {
+              console.log("Firebase not initialized yet, waiting...");
+              setTimeout(() => {
+                  if (firebaseInitialized) {
+                      console.log("Firebase now initialized, proceeding with sign up");
+                      processSignUp(email, password);
+                  } else {
+                      console.error("Firebase still not initialized after waiting");
+                      alert("Error: Firebase not initialized. Please try again in a moment.");
+                  }
+              }, 3000);
+          } else {
+              processSignUp(email, password);
           }
-
+      });
+      
+      function processSignUp(email, password) {
           createUserWithEmailAndPassword(auth, email, password)
               .then((userCredential) => {
                   // Show success popup
@@ -95,7 +129,7 @@
                   console.error("Error signing up:", error);
                   alert("Error signing up: " + error.message);
               });
-      });
+      }
       
       // Close button functionality
       document.querySelector('.close-button').addEventListener('click', function() {
