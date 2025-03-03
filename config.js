@@ -22,6 +22,17 @@ if (window.location.hostname === 'localhost' || window.location.hostname === '12
             };
         })
         .catch(error => console.error('Error loading .env file:', error));
+} else {
+    // For production environment
+    window.firebaseConfig = {
+        apiKey: "FIREBASE_API_KEY",
+        authDomain: "FIREBASE_AUTH_DOMAIN",
+        projectId: "FIREBASE_PROJECT_ID",
+        storageBucket: "FIREBASE_STORAGE_BUCKET",
+        messagingSenderId: "FIREBASE_MESSAGING_SENDER_ID",
+        appId: "FIREBASE_APP_ID",
+        measurementId: "FIREBASE_MEASUREMENT_ID"
+    };
 }
 
 const firebaseConfig = {
