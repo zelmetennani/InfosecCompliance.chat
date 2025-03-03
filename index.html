@@ -60,5 +60,26 @@
             <p>©<script>document.write(new Date().getFullYear());</script> Infosec Compliance Chat. All rights reserved.</p>
         </footer>
     </main>
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-analytics.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "FIREBASE_API_KEY",
+            authDomain: "FIREBASE_AUTH_DOMAIN",
+            projectId: "FIREBASE_PROJECT_ID",
+            storageBucket: "FIREBASE_STORAGE_BUCKET",
+            messagingSenderId: "FIREBASE_MESSAGING_SENDER_ID",
+            appId: "FIREBASE_APP_ID",
+            measurementId: "FIREBASE_MEASUREMENT_ID"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+    </script>
 </body>
 </html> 
