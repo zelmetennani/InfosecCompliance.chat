@@ -413,4 +413,14 @@ input[type="password"]:focus {
     cursor: pointer;
     padding: 0 10px;
     font-size: 0.875rem;
+}
+
+.logo-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.logo-link:hover .logo {
+    color: var(--primary-color);
 } 
