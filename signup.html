@@ -157,11 +157,30 @@
           document.getElementById('successPopup').style.display = 'none';
       });
 
-      // Add this after initializing auth
-      const googleProvider = new GoogleAuthProvider();
-      
-      // Add this Google Sign Up functionality
+      // Modify the Google Sign Up functionality
       document.getElementById('googleSignUp').addEventListener('click', function() {
+          // Check if Firebase is initialized before proceeding
+          if (!firebaseInitialized) {
+              console.log("Firebase not initialized yet, waiting...");
+              alert("Please wait a moment while we connect to our services...");
+              setTimeout(() => {
+                  if (firebaseInitialized) {
+                      console.log("Firebase now initialized, proceeding with Google sign up");
+                      signInWithGoogle();
+                  } else {
+                      console.error("Firebase still not initialized after waiting");
+                      alert("Error: Could not connect to authentication services. Please try again in a moment.");
+                  }
+              }, 3000);
+          } else {
+              signInWithGoogle();
+          }
+      });
+      
+      function signInWithGoogle() {
+          const auth = getAuth();
+          const googleProvider = new GoogleAuthProvider();
+          
           signInWithPopup(auth, googleProvider)
               .then((result) => {
                   // Show success popup
@@ -170,7 +189,7 @@
                   console.error("Error signing up with Google:", error);
                   alert("Error signing up with Google: " + error.message);
               });
-      });
+      }
     </script>
 
     <script>
