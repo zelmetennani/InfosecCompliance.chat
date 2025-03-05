@@ -81,8 +81,15 @@
     <!-- Firebase SDKs -->
     <script src="config.js"></script>
     <script type="module">
+      // Import Firebase modules
       import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-      import { getAuth, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+      import { 
+        getAuth, 
+        createUserWithEmailAndPassword, 
+        GoogleAuthProvider, 
+        signInWithRedirect,
+        getRedirectResult
+      } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
       let app, auth;
       let firebaseInitialized = false;
@@ -157,39 +164,57 @@
           document.getElementById('successPopup').style.display = 'none';
       });
 
-      // Modify the Google Sign Up functionality
+      // Update the Google Sign Up functionality
       document.getElementById('googleSignUp').addEventListener('click', function() {
-          // Check if Firebase is initialized before proceeding
-          if (!firebaseInitialized) {
-              console.log("Firebase not initialized yet, waiting...");
-              alert("Please wait a moment while we connect to our services...");
-              setTimeout(() => {
-                  if (firebaseInitialized) {
-                      console.log("Firebase now initialized, proceeding with Google sign up");
-                      signInWithGoogle();
-                  } else {
-                      console.error("Firebase still not initialized after waiting");
-                      alert("Error: Could not connect to authentication services. Please try again in a moment.");
-                  }
-              }, 3000);
-          } else {
-              signInWithGoogle();
-          }
+        // Use a direct Firebase config instead of relying on window.firebaseConfig
+        const firebaseConfig = {
+          apiKey: "AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs",
+          authDomain: "infoseccompliance-chat.firebaseapp.com",
+          projectId: "infoseccompliance-chat",
+          storageBucket: "infoseccompliance-chat.firebasestorage.app",
+          messagingSenderId: "85538751648",
+          appId: "1:85538751648:web:33636b48d1f0751d9775c5",
+          measurementId: "G-T8PJLE1Q4X"
+        };
+        
+        // Initialize Firebase directly
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        
+        // Use signInWithRedirect instead of popup for better compatibility
+        signInWithRedirect(auth, provider)
+          .catch((error) => {
+            console.error("Error starting Google sign-in redirect:", error);
+            alert("Error signing in with Google: " + error.message);
+          });
       });
       
-      function signInWithGoogle() {
-          const auth = getAuth();
-          const googleProvider = new GoogleAuthProvider();
+      // Check for redirect result when page loads
+      window.addEventListener('DOMContentLoaded', async () => {
+        try {
+          const firebaseConfig = {
+            apiKey: "AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs",
+            authDomain: "infoseccompliance-chat.firebaseapp.com",
+            projectId: "infoseccompliance-chat",
+            storageBucket: "infoseccompliance-chat.firebasestorage.app",
+            messagingSenderId: "85538751648",
+            appId: "1:85538751648:web:33636b48d1f0751d9775c5",
+            measurementId: "G-T8PJLE1Q4X"
+          };
           
-          signInWithPopup(auth, googleProvider)
-              .then((result) => {
-                  // Show success popup
-                  document.getElementById('successPopup').style.display = 'flex';
-              }).catch((error) => {
-                  console.error("Error signing up with Google:", error);
-                  alert("Error signing up with Google: " + error.message);
-              });
-      }
+          const app = initializeApp(firebaseConfig);
+          const auth = getAuth(app);
+          
+          const result = await getRedirectResult(auth);
+          if (result) {
+            // User successfully signed in with Google
+            document.getElementById('successPopup').style.display = 'flex';
+          }
+        } catch (error) {
+          console.error("Error processing redirect result:", error);
+        }
+      });
     </script>
 
     <script>
