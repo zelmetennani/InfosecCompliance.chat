@@ -11,7 +11,12 @@
 <body>
     <nav class="navbar">
         <div class="nav-content">
-            <div class="logo">Infosec Compliance Chat</div>
+            <a href="index.html" class="logo-link">
+                <div class="logo">
+                    <img src="/favicon/favicon.ico" alt="Logo" class="logo-icon">
+                    Infosec Compliance Chat
+                </div>
+            </a>
             <div class="nav-links">
                 <a href="signin.html" class="nav-link">Sign In</a>
                 <a href="signup.html" class="cta-button-small">Sign Up</a>
@@ -33,6 +38,12 @@
                 <div class="form-group">
                     <input type="password" id="signInPassword" name="password" placeholder="Password" required>
                 </div>
+                <div class="form-group">
+                    <button type="button" id="googleSignIn" class="google-button">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="google-icon">
+                        Sign in with Google
+                    </button>
+                </div>
                 <button type="submit" class="cta-button">Sign In</button>
                 <p class="form-footer">
                     Need an account? <a href="signup.html">Sign up</a>
@@ -48,7 +59,7 @@
     <!-- Firebase SDKs -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-      import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+      import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
       const firebaseConfig = {
         apiKey: "AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs",
@@ -61,6 +72,7 @@
 
       const app = initializeApp(firebaseConfig);
       const auth = getAuth(app);
+      const googleProvider = new GoogleAuthProvider();
 
       document.getElementById('signInForm').addEventListener('submit', function(event) {
           event.preventDefault();
@@ -74,6 +86,18 @@
               .catch((error) => {
                   console.error("Error signing in:", error);
                   alert("Error signing in: " + error.message);
+              });
+      });
+      
+      // Add Google Sign In functionality
+      document.getElementById('googleSignIn').addEventListener('click', function() {
+          signInWithPopup(auth, googleProvider)
+              .then((result) => {
+                  // User signed in
+                  window.location.href = "https://app.infoseccompliance.chat";
+              }).catch((error) => {
+                  console.error("Error signing in with Google:", error);
+                  alert("Error signing in with Google: " + error.message);
               });
       });
     </script>
