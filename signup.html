@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sign up for Infosec Compliance Chat - AI-powered compliance insights">
+    <title>[dev] Sign Up - Infosec Compliance Chat</title>
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="index.html" class="logo-link">
+                <div class="logo">
+                    <img src="/favicon/favicon.ico" alt="Logo" class="logo-icon">
+                    Infosec Compliance Chat
+                </div>
+            </a>
+            <div class="nav-links">
+                <a href="signin.html" class="nav-link">Sign In</a>
+                <a href="signup.html" class="cta-button-small">Sign Up</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <header>
+            <h1 class="fade-in">Create Your Account</h1>
+            <p class="subtitle fade-in">Get started with AI-powered compliance insights</p>
+        </header>
+
+        <section class="auth-section fade-in">
+            <form id="signUpForm" class="signup-form">
+                <div class="form-group">
+                    <input type="email" id="signUpEmail" name="email" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <div class="password-container">
+                        <input type="text" id="signUpPassword" name="password" 
+                               placeholder="Password" required minlength="6" 
+                               autocomplete="off" class="password-input">
+                        <button type="button" id="togglePassword" class="toggle-password">
+                            Show
+                        </button>
+                    </div>
+                    <p class="help-text">Password must be at least 6 characters</p>
+                </div>
+                <button type="submit" class="cta-button">Create Account</button>
+                <div class="form-group" style="margin-top: 1rem;">
+                    <div class="separator">
+                        <span>or</span>
+                    </div>
+                    <button type="button" id="googleSignUp" class="google-button">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="google-icon">
+                        Sign up with Google
+                    </button>
+                </div>
+                <p class="form-footer">
+                    Already have an account? <a href="signin.html">Sign in</a>
+                </p>
+            </form>
+
+            <!-- Success notification popup -->
+            <div id="successPopup" class="notification-popup">
+                <div class="notification-content">
+                    <span class="close-button">&times;</span>
+                    <div class="success-icon">✓</div>
+                    <h3>Account Created!</h3>
+                    <p>Your account has been successfully created.</p>
+                    <a href="signin.html" class="cta-button">Sign In Now</a>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>©<script>document.write(new Date().getFullYear());</script> Infosec Compliance Chat. All rights reserved.</p>
+        </footer>
+    </main>
+
+    <!-- Firebase SDKs -->
+    <script src="config.js"></script>
+    <script type="module">
+      // Import Firebase modules
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+      import { 
+        getAuth, 
+        createUserWithEmailAndPassword, 
+        GoogleAuthProvider, 
+        signInWithPopup
+      } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+
+      let app, auth;
+      let firebaseInitialized = false;
+      
+      // Initialize Firebase when config is ready
+      document.addEventListener('firebaseConfigReady', function() {
+          console.log("Initializing Firebase with config:", window.firebaseConfig);
+          try {
+              app = initializeApp(window.firebaseConfig);
+              auth = getAuth(app);
+              firebaseInitialized = true;
+              console.log("Firebase successfully initialized");
+          } catch (error) {
+              console.error("Error initializing Firebase:", error);
+          }
+      });
+
+      // Fallback initialization after a delay if the event doesn't fire
+      setTimeout(() => {
+          if (!firebaseInitialized && window.firebaseConfig) {
+              console.log("Fallback: Initializing Firebase with config:", window.firebaseConfig);
+              try {
+                  app = initializeApp(window.firebaseConfig);
+                  auth = getAuth(app);
+                  firebaseInitialized = true;
+                  console.log("Firebase successfully initialized (fallback)");
+              } catch (error) {
+                  console.error("Error initializing Firebase (fallback):", error);
+              }
+          }
+      }, 2000);
+
+      document.getElementById('signUpForm').addEventListener('submit', function(event) {
+          event.preventDefault();
+          const email = document.getElementById('signUpEmail').value;
+          const password = document.getElementById('signUpPassword').value;
+
+          // Wait for Firebase to initialize if it hasn't already
+          if (!firebaseInitialized) {
+              console.log("Firebase not initialized yet, waiting...");
+              setTimeout(() => {
+                  if (firebaseInitialized) {
+                      console.log("Firebase now initialized, proceeding with sign up");
+                      processSignUp(email, password);
+                  } else {
+                      console.error("Firebase still not initialized after waiting");
+                      alert("Error: Firebase not initialized. Please try again in a moment.");
+                  }
+              }, 3000);
+          } else {
+              processSignUp(email, password);
+          }
+      });
+      
+      function processSignUp(email, password) {
+          createUserWithEmailAndPassword(auth, email, password)
+              .then((userCredential) => {
+                  // Show success popup
+                  document.getElementById('successPopup').style.display = 'flex';
+                  
+                  // Clear the form
+                  document.getElementById('signUpForm').reset();
+              })
+              .catch((error) => {
+                  console.error("Error signing up:", error);
+                  alert("Error signing up: " + error.message);
+              });
+      }
+      
+      // Close button functionality
+      document.querySelector('.close-button').addEventListener('click', function() {
+          document.getElementById('successPopup').style.display = 'none';
+      });
+
+      // Update the Google Sign Up functionality
+      document.getElementById('googleSignUp').addEventListener('click', function() {
+        // Get the existing Firebase auth instance
+        const auth = getAuth();
+        const provider = new GoogleAuthProvider();
+        
+        signInWithPopup(auth, provider)
+          .then((result) => {
+            console.log("Google sign-up successful");
+            document.getElementById('successPopup').style.display = 'flex';
+          })
+          .catch((error) => {
+            console.error("Error with Google sign-up:", error);
+            alert("Error signing up with Google: " + error.message);
+          });
+      });
+    </script>
+
+    <script>
+      // Debug: Check if Firebase config is properly set
+      window.addEventListener('DOMContentLoaded', function() {
+        console.log("Current Firebase config:", window.firebaseConfig);
+        
+        // Check if API key looks valid
+        if (window.firebaseConfig && window.firebaseConfig.apiKey) {
+          if (window.firebaseConfig.apiKey.includes("AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs") || 
+              window.firebaseConfig.apiKey.includes("##AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs##")) {
+            console.error("Firebase API key placeholder not replaced!");
+          } else {
+            console.log("Firebase API key appears to be set correctly");
+          }
+        } else {
+          console.error("Firebase API key is missing!");
+        }
+      });
+    </script>
+
+    <!-- Add this at the bottom of your script section -->
+    <script>
+      document.getElementById('signUpPassword').addEventListener('input', function(event) {
+          console.log('Password input event fired');
+      });
+
+      document.getElementById('signUpPassword').addEventListener('keydown', function(event) {
+          console.log('Password keydown event fired, key:', event.key);
+      });
+
+      // Check for any errors that might be preventing input
+      window.addEventListener('error', function(event) {
+          console.error('Global error caught:', event.error);
+      });
+    </script>
+
+    <!-- Password field handling -->
+    <script>
+      document.getElementById('togglePassword').addEventListener('click', function() {
+          const passwordInput = document.getElementById('signUpPassword');
+          const type = passwordInput.getAttribute('type') === 'text' ? 'password' : 'text';
+          passwordInput.setAttribute('type', type);
+          this.textContent = type === 'text' ? 'Hide' : 'Show';
+      });
+
+      // Manually handle the password input
+      const passwordInput = document.getElementById('signUpPassword');
+      passwordInput.value = ''; // Clear any initial value
+
+      // For Firebase, let's try a completely different approach
+      // Add this to the bottom of your page
+      document.addEventListener('DOMContentLoaded', function() {
+          // Hardcoded Firebase config for testing
+          const firebaseConfig = {
+              apiKey: "AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs",
+              authDomain: "infoseccompliance-chat.firebaseapp.com",
+              projectId: "infoseccompliance-chat",
+              storageBucket: "infoseccompliance-chat.firebasestorage.app",
+              messagingSenderId: "85538751648",
+              appId: "1:85538751648:web:33636b48d1f0751d9775c5",
+              measurementId: "G-T8PJLE1Q4X"
+          };
+          
+          // Initialize Firebase directly
+          import('https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js')
+              .then(module => {
+                  const { initializeApp } = module;
+                  const app = initializeApp(firebaseConfig);
+                  
+                  return import('https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js');
+              })
+              .then(module => {
+                  const { getAuth, createUserWithEmailAndPassword } = module;
+                  const auth = getAuth();
+                  
+                  // Set up form submission
+                  document.getElementById('signUpForm').addEventListener('submit', function(event) {
+                      event.preventDefault();
+                      const email = document.getElementById('signUpEmail').value;
+                      const password = document.getElementById('signUpPassword').value;
+                      
+                      createUserWithEmailAndPassword(auth, email, password)
+                          .then((userCredential) => {
+                              // Show success popup
+                              document.getElementById('successPopup').style.display = 'flex';
+                              
+                              // Clear the form
+                              document.getElementById('signUpForm').reset();
+                          })
+                          .catch((error) => {
+                              console.error("Error signing up:", error);
+                              alert("Error signing up: " + error.message);
+                          });
+                  });
+                  
+                  // Close button functionality
+                  document.querySelector('.close-button').addEventListener('click', function() {
+                      document.getElementById('successPopup').style.display = 'none';
+                  });
+              })
+              .catch(error => {
+                  console.error("Error loading Firebase:", error);
+              });
+      });
+    </script>
+</body>
+</html> 
