@@ -89,31 +89,20 @@
               });
       });
       
-      // Add Google Sign In functionality
+      // Simple Google Sign In
       document.getElementById('googleSignIn').addEventListener('click', function() {
-        try {
-          // Use the existing Firebase config from the page
-          // This is already loaded at the top of the script
-          
-          // Initialize Firebase directly for this operation
-          const app = initializeApp(firebaseConfig, 'googleSignIn');
-          const auth = getAuth(app);
-          const provider = new GoogleAuthProvider();
-          
-          // Use popup for better flow control
-          signInWithPopup(auth, provider)
-            .then((result) => {
-              console.log("Google sign-in successful");
-              window.location.href = "https://app.infoseccompliance.chat";
-            })
-            .catch((error) => {
-              console.error("Error signing in with Google:", error);
-              alert("Error signing in with Google: " + error.message);
-            });
-        } catch (error) {
-          console.error("Error in Google sign-in setup:", error);
-          alert("Error setting up Google sign-in: " + error.message);
-        }
+        const auth = getAuth();
+        const provider = new GoogleAuthProvider();
+        
+        signInWithPopup(auth, provider)
+          .then((result) => {
+            console.log("Google sign-in successful");
+            window.location.href = "https://app.infoseccompliance.chat";
+          })
+          .catch((error) => {
+            console.error("Error with Google sign-in:", error);
+            alert("Error signing in with Google: " + error.message);
+          });
       });
     </script>
 </body>

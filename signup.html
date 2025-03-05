@@ -165,33 +165,19 @@
 
       // Update the Google Sign Up functionality
       document.getElementById('googleSignUp').addEventListener('click', function() {
-        try {
-          // Use the existing Firebase config from window.firebaseConfig
-          // This is loaded from your environment variables via config.js
-          if (!window.firebaseConfig) {
-            throw new Error("Firebase configuration not available");
-          }
-          
-          // Initialize Firebase directly for this operation
-          const app = initializeApp(window.firebaseConfig, 'googleSignIn');
-          const auth = getAuth(app);
-          const provider = new GoogleAuthProvider();
-          
-          // Use popup for better flow control
-          signInWithPopup(auth, provider)
-            .then((result) => {
-              console.log("Google sign-in successful");
-              // Show success popup
-              document.getElementById('successPopup').style.display = 'flex';
-            })
-            .catch((error) => {
-              console.error("Error signing in with Google:", error);
-              alert("Error signing in with Google: " + error.message);
-            });
-        } catch (error) {
-          console.error("Error in Google sign-in setup:", error);
-          alert("Error setting up Google sign-in: " + error.message);
-        }
+        // Get the existing Firebase auth instance
+        const auth = getAuth();
+        const provider = new GoogleAuthProvider();
+        
+        signInWithPopup(auth, provider)
+          .then((result) => {
+            console.log("Google sign-up successful");
+            document.getElementById('successPopup').style.display = 'flex';
+          })
+          .catch((error) => {
+            console.error("Error with Google sign-up:", error);
+            alert("Error signing up with Google: " + error.message);
+          });
       });
     </script>
 
