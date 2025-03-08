@@ -84,6 +84,13 @@
           
           signInWithEmailAndPassword(auth, email, password)
               .then((userCredential) => {
+                  // Get the user's ID token
+                  return userCredential.user.getIdToken(true);
+              })
+              .then((idToken) => {
+                  // Store the token in localStorage
+                  localStorage.setItem('authToken', idToken);
+                  // Redirect to app
                   window.location.href = "https://app.infoseccompliance.chat";
               })
               .catch((error) => {
