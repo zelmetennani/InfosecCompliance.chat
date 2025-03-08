@@ -91,7 +91,7 @@
                   // Store the token in localStorage
                   localStorage.setItem('authToken', idToken);
                   // Redirect to app
-                  window.location.href = "https://app.infoseccompliance.chat";
+                  window.location.href = "https://app.infoseccompliance.chat/dashboard.html";
               })
               .catch((error) => {
                   console.error("Error signing in:", error);
@@ -120,7 +120,7 @@
             localStorage.setItem('authToken', idToken);
             console.log("Token stored in localStorage");
             // Redirect to app
-            window.location.href = "https://app.infoseccompliance.chat";
+            window.location.href = "https://app.infoseccompliance.chat/dashboard.html";
           })
           .catch((error) => {
             console.error("Error with Google sign-in:", error);
