@@ -112,6 +112,14 @@
         signInWithPopup(auth, provider)
           .then((result) => {
             console.log("Google sign-in successful");
+            // Get the user's ID token
+            return result.user.getIdToken(true);
+          })
+          .then((idToken) => {
+            // Store the token in localStorage
+            localStorage.setItem('authToken', idToken);
+            console.log("Token stored in localStorage");
+            // Redirect to app
             window.location.href = "https://app.infoseccompliance.chat";
           })
           .catch((error) => {
