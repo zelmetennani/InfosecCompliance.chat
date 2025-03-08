@@ -79,6 +79,9 @@
           const email = document.getElementById('signInEmail').value;
           const password = document.getElementById('signInPassword').value;
 
+          // Set a flag in localStorage to indicate we just logged in
+          localStorage.setItem('justLoggedIn', 'true');
+          
           signInWithEmailAndPassword(auth, email, password)
               .then((userCredential) => {
                   window.location.href = "https://app.infoseccompliance.chat";
@@ -86,6 +89,8 @@
               .catch((error) => {
                   console.error("Error signing in:", error);
                   alert("Error signing in: " + error.message);
+                  // Clear the flag if login failed
+                  localStorage.removeItem('justLoggedIn');
               });
       });
       
@@ -93,6 +98,9 @@
       document.getElementById('googleSignIn').addEventListener('click', function() {
         const auth = getAuth();
         const provider = new GoogleAuthProvider();
+        
+        // Set a flag in localStorage to indicate we just logged in
+        localStorage.setItem('justLoggedIn', 'true');
         
         signInWithPopup(auth, provider)
           .then((result) => {
@@ -102,6 +110,8 @@
           .catch((error) => {
             console.error("Error with Google sign-in:", error);
             alert("Error signing in with Google: " + error.message);
+            // Clear the flag if login failed
+            localStorage.removeItem('justLoggedIn');
           });
       });
     </script>

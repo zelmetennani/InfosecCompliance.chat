@@ -169,6 +169,9 @@
         const auth = getAuth();
         const provider = new GoogleAuthProvider();
         
+        // Set a flag in localStorage to indicate this is a new signup
+        localStorage.setItem('newSignup', 'true');
+        
         signInWithPopup(auth, provider)
           .then((result) => {
             console.log("Google sign-up successful");
@@ -177,6 +180,8 @@
           .catch((error) => {
             console.error("Error with Google sign-up:", error);
             alert("Error signing up with Google: " + error.message);
+            // Clear the flag if signup failed
+            localStorage.removeItem('newSignup');
           });
       });
     </script>
