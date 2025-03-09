@@ -70,6 +70,45 @@
             appId: "##1:85538751648:web:33636b48d1f0751d9775c5##"
         };
 
+        // Check if placeholders weren't replaced and use fallback for local development
+        if (firebaseConfig.apiKey.includes('##AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs##')) {
+            console.warn("Firebase config placeholders not replaced. Using development config.");
+            
+            // For local development only - this code won't be in the production build
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                // Try to load from local .env file
+                fetch('/.env')
+                    .then(response => response.text())
+                    .then(text => {
+                        const envVars = {};
+                        text.split('\n').forEach(line => {
+                            const [key, value] = line.split('=');
+                            if (key && value) {
+                                envVars[key.trim()] = value.trim();
+                            }
+                        });
+                        
+                        if (envVars.AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs) {
+                            firebaseConfig.apiKey = envVars.AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs;
+                            firebaseConfig.authDomain = envVars.infoseccompliance-chat.firebaseapp.com;
+                            firebaseConfig.projectId = envVars.infoseccompliance-chat;
+                            firebaseConfig.storageBucket = envVars.infoseccompliance-chat.firebasestorage.app;
+                            firebaseConfig.messagingSenderId = envVars.85538751648;
+                            firebaseConfig.appId = envVars.1:85538751648:web:33636b48d1f0751d9775c5;
+                            
+                            // Reinitialize Firebase with the new config
+                            firebase.initializeApp(firebaseConfig);
+                            console.log("Firebase reinitialized with local config");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error loading local config:", error);
+                    });
+            } else {
+                console.error("Firebase config placeholders not replaced in production build!");
+            }
+        }
+
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         
