@@ -63,6 +63,64 @@
     </main>
 
     <script>
+        // Add event listener as soon as possible
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM fully loaded");
+            const googleButton = document.getElementById('googleSignIn');
+            if (googleButton) {
+                console.log("Google sign-in button found, adding click listener");
+                googleButton.addEventListener('click', handleGoogleSignIn);
+            } else {
+                console.error("Google sign-in button not found!");
+            }
+        });
+        
+        // Separate function for Google sign-in
+        function handleGoogleSignIn() {
+            console.log("Google sign-in handler called");
+            
+            // Debug: Check if Firebase is initialized
+            if (!firebase || !firebase.auth) {
+                console.error("Firebase or firebase.auth is not available");
+                alert("Authentication service not available. Please try again later.");
+                return;
+            }
+            
+            console.log("Creating Google auth provider");
+            const provider = new firebase.auth.GoogleAuthProvider();
+            console.log("Google provider created:", provider);
+            
+            // Add scopes for additional permissions if needed
+            provider.addScope('profile');
+            provider.addScope('email');
+            
+            console.log("Attempting sign in with popup");
+            
+            firebase.auth().signInWithPopup(provider)
+                .then((result) => {
+                    console.log("Sign in popup completed");
+                    console.log("User credential received:", result.user ? "User exists" : "No user");
+                    console.log("User email:", result.user ? result.user.email : "Unknown");
+                    console.log("User display name:", result.user ? result.user.displayName : "Unknown");
+                    return result.user.getIdToken(true);
+                })
+                .then((idToken) => {
+                    console.log("ID token received, length:", idToken ? idToken.length : 0);
+                    localStorage.setItem('authToken', idToken);
+                    console.log("Token stored in localStorage");
+                    console.log("Redirecting to app...");
+                    window.location.href = "https://app.infoseccompliance.chat/";
+                })
+                .catch((error) => {
+                    console.error("Error with Google sign-in:", error);
+                    console.error("Error code:", error.code);
+                    console.error("Error message:", error.message);
+                    console.error("Error email:", error.email);
+                    console.error("Error credential:", error.credential);
+                    alert("Error signing in with Google: " + error.message);
+                });
+        }
+
         // Firebase configuration with placeholders for GitHub Actions to replace
         const firebaseConfig = {
             apiKey: "##FIREBASE_API_KEY##",
@@ -143,27 +201,6 @@
                 .catch((error) => {
                     console.error("Error signing in:", error);
                     alert("Error signing in: " + error.message);
-                });
-        });
-        
-        // Google Sign In
-        document.getElementById('googleSignIn').addEventListener('click', function() {
-            console.log("Google sign-in button clicked");
-            
-            const provider = new firebase.auth.GoogleAuthProvider();
-            
-            firebase.auth().signInWithPopup(provider)
-                .then((result) => {
-                    console.log("Google sign-in successful");
-                    return result.user.getIdToken(true);
-                })
-                .then((idToken) => {
-                    localStorage.setItem('authToken', idToken);
-                    window.location.href = "https://app.infoseccompliance.chat/";
-                })
-                .catch((error) => {
-                    console.error("Error with Google sign-in:", error);
-                    alert("Error signing in with Google: " + error.message);
                 });
         });
     </script>
