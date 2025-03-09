@@ -38,11 +38,19 @@
                 <div class="form-group">
                     <input type="email" id="signUpEmail" name="email" placeholder="Email" required>
                 </div>
-                <div class="form-group password-group">
+                <div class="form-group">
                     <input type="password" id="signUpPassword" name="password" placeholder="Password" required>
-                    <button type="button" id="togglePassword" class="toggle-password">Show</button>
                 </div>
                 <button type="submit" class="cta-button">Sign Up</button>
+                <div class="form-group" style="margin-top: 1rem;">
+                    <div class="separator">
+                        <span>or</span>
+                    </div>
+                    <button type="button" id="googleSignUp" class="google-button">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="google-icon">
+                        Sign up with Google
+                    </button>
+                </div>
                 <p class="form-footer">
                     Already have an account? <a href="signin.html">Sign in</a>
                 </p>
@@ -101,12 +109,33 @@
                 });
         });
         
-        // Toggle password visibility
-        document.getElementById('togglePassword').addEventListener('click', function() {
-            const passwordInput = document.getElementById('signUpPassword');
-            const type = passwordInput.getAttribute('type') === 'text' ? 'password' : 'text';
-            passwordInput.setAttribute('type', type);
-            this.textContent = type === 'text' ? 'Hide' : 'Show';
+        // Google Sign Up
+        document.getElementById('googleSignUp').addEventListener('click', function() {
+            console.log("Google sign-up button clicked");
+            
+            const provider = new firebase.auth.GoogleAuthProvider();
+            
+            firebase.auth().signInWithPopup(provider)
+                .then((result) => {
+                    console.log("Google sign-up successful");
+                    // Check if this is a new user
+                    const isNewUser = result.additionalUserInfo.isNewUser;
+                    
+                    if (isNewUser) {
+                        // Show success popup for new users
+                        document.getElementById('successPopup').style.display = 'flex';
+                    } else {
+                        // Redirect existing users to the app
+                        return result.user.getIdToken(true).then(idToken => {
+                            localStorage.setItem('authToken', idToken);
+                            window.location.href = "https://app.infoseccompliance.chat/";
+                        });
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error with Google sign-up:", error);
+                    alert("Error signing up with Google: " + error.message);
+                });
         });
         
         // Close success popup
