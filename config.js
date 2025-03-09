@@ -6,23 +6,19 @@ if (window.firebaseConfigInitialized) {
     
     console.log("Starting Firebase config initialization");
     
-    // For production environment - these placeholders will be replaced by GitHub Actions
+    // Firebase configuration - placeholders will be replaced during build
     window.firebaseConfig = {
         apiKey: "##FIREBASE_API_KEY##",
         authDomain: "##FIREBASE_AUTH_DOMAIN##",
         projectId: "##FIREBASE_PROJECT_ID##",
         storageBucket: "##FIREBASE_STORAGE_BUCKET##",
         messagingSenderId: "##FIREBASE_MESSAGING_SENDER_ID##",
-        appId: "##FIREBASE_APP_ID##",
-        measurementId: "##FIREBASE_MEASUREMENT_ID##"
+        appId: "##FIREBASE_APP_ID##"
     };
     
-    console.log("Firebase config set:", window.firebaseConfig);
-    
-    // Check if we're in development mode
+    // For development environments, try to load from .env file
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        console.log("Running in development mode");
-        // In development, try to fetch from .env file
+        console.log("Development environment detected, attempting to load local config");
         fetch('/.env')
             .then(response => response.text())
             .then(text => {
@@ -34,35 +30,45 @@ if (window.firebaseConfigInitialized) {
                     }
                 });
                 
-                window.firebaseConfig = {
-                    apiKey: envVars.FIREBASE_API_KEY,
-                    authDomain: envVars.FIREBASE_AUTH_DOMAIN,
-                    projectId: envVars.FIREBASE_PROJECT_ID,
-                    storageBucket: envVars.FIREBASE_STORAGE_BUCKET,
-                    messagingSenderId: envVars.FIREBASE_MESSAGING_SENDER_ID,
-                    appId: envVars.FIREBASE_APP_ID,
-                    measurementId: envVars.FIREBASE_MEASUREMENT_ID
-                };
-                
-                console.log("Firebase config loaded from .env");
-                
-                // Initialize Firebase after config is loaded
+                // Override with local values
+                if (envVars.FIREBASE_API_KEY) {
+                    window.firebaseConfig = {
+                        apiKey: envVars.FIREBASE_API_KEY,
+                        authDomain: envVars.FIREBASE_AUTH_DOMAIN,
+                        projectId: envVars.FIREBASE_PROJECT_ID,
+                        storageBucket: envVars.FIREBASE_STORAGE_BUCKET,
+                        messagingSenderId: envVars.FIREBASE_MESSAGING_SENDER_ID,
+                        appId: envVars.FIREBASE_APP_ID
+                    };
+                    console.log("Config loaded from local .env file");
+                }
                 initializeFirebase();
             })
             .catch(error => {
-                console.error('Error loading .env file:', error);
-                // Use the production config already set
+                console.error("Error loading local config:", error);
                 initializeFirebase();
             });
     } else {
-        console.log("Running in production mode");
+        // Production environment
         initializeFirebase();
     }
     
-    // This function will be called after config is loaded
     function initializeFirebase() {
-        // We'll initialize Firebase in the individual pages
-        console.log("Dispatching firebaseConfigReady event");
+        // Check if placeholders were replaced
+        if (window.firebaseConfig.apiKey.includes('##FIREBASE_API_KEY##')) {
+            console.error("Firebase configuration placeholders not replaced!");
+            // For testing only - remove in production
+            window.firebaseConfig = {
+                apiKey: "AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs",
+                authDomain: "infoseccompliance-chat.firebaseapp.com",
+                projectId: "infoseccompliance-chat",
+                storageBucket: "infoseccompliance-chat.appspot.com",
+                messagingSenderId: "85538751648",
+                appId: "1:85538751648:web:f1a594d9b4d7dfaf9775c5"
+            };
+        }
+        
+        console.log("Firebase config ready");
         document.dispatchEvent(new Event('firebaseConfigReady'));
     }
 } 

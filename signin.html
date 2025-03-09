@@ -61,60 +61,27 @@
       import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
       import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-      let firebaseConfig = {};
+      let app, auth, googleProvider;
 
-      function loadFirebaseConfig() {
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-          fetch('/.env.public')
-            .then(response => response.text())
-            .then(text => {
-              const envVars = {};
-              text.split('\n').forEach(line => {
-                const [key, value] = line.split('=');
-                if (key && value) {
-                  envVars[key.trim()] = value.trim();
-                }
-              });
-              
-              firebaseConfig = {
-                apiKey: envVars.FIREBASE_API_KEY,
-                authDomain: envVars.FIREBASE_AUTH_DOMAIN,
-                projectId: envVars.FIREBASE_PROJECT_ID,
-                storageBucket: envVars.FIREBASE_STORAGE_BUCKET,
-                messagingSenderId: envVars.FIREBASE_MESSAGING_SENDER_ID,
-                appId: envVars.FIREBASE_APP_ID
-              };
-              
-              initializeFirebase();
-            })
-            .catch(error => {
-              console.error("Could not load environment variables:", error);
-              if (window.firebaseConfig) {
-                firebaseConfig = window.firebaseConfig;
-                initializeFirebase();
-              } else {
-                console.error("No Firebase config available");
-              }
-            });
-        } else {
-          if (window.firebaseConfig) {
-            firebaseConfig = window.firebaseConfig;
-            initializeFirebase();
-          } else {
-            console.error("No Firebase config available");
-          }
+      // Wait for Firebase config to be ready
+      document.addEventListener('firebaseConfigReady', function() {
+        try {
+          // Initialize Firebase
+          app = initializeApp(window.firebaseConfig);
+          auth = getAuth(app);
+          googleProvider = new GoogleAuthProvider();
+          
+          // Set up event listeners
+          setupAuthListeners();
+          
+          console.log("Firebase auth initialized in signin.html");
+        } catch (error) {
+          console.error("Error initializing Firebase:", error);
         }
-      }
+      });
 
-      function initializeFirebase() {
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const googleProvider = new GoogleAuthProvider();
-        
-        setupAuthListeners(auth, googleProvider);
-      }
-
-      function setupAuthListeners(auth, googleProvider) {
+      function setupAuthListeners() {
+        // Email/Password Sign In
         document.getElementById('signInForm').addEventListener('submit', function(event) {
           event.preventDefault();
           const email = document.getElementById('signInEmail').value;
@@ -123,20 +90,21 @@
           localStorage.setItem('justLoggedIn', 'true');
           
           signInWithEmailAndPassword(auth, email, password)
-              .then((userCredential) => {
-                  return userCredential.user.getIdToken(true);
-              })
-              .then((idToken) => {
-                  localStorage.setItem('authToken', idToken);
-                  window.location.href = "https://app.infoseccompliance.chat/";
-              })
-              .catch((error) => {
-                  console.error("Error signing in:", error);
-                  alert("Error signing in: " + error.message);
-                  localStorage.removeItem('justLoggedIn');
-              });
+            .then((userCredential) => {
+              return userCredential.user.getIdToken(true);
+            })
+            .then((idToken) => {
+              localStorage.setItem('authToken', idToken);
+              window.location.href = "https://app.infoseccompliance.chat/";
+            })
+            .catch((error) => {
+              console.error("Error signing in:", error);
+              alert("Error signing in: " + error.message);
+              localStorage.removeItem('justLoggedIn');
+            });
         });
         
+        // Google Sign In
         document.getElementById('googleSignIn').addEventListener('click', function() {
           localStorage.setItem('justLoggedIn', 'true');
           
@@ -157,8 +125,6 @@
             });
         });
       }
-
-      document.addEventListener('DOMContentLoaded', loadFirebaseConfig);
     </script>
 </body>
 </html> 
