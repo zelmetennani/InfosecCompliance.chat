@@ -61,74 +61,104 @@
       import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
       import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs",
-        authDomain: "infoseccompliance-chat.firebaseapp.com",
-        projectId: "infoseccompliance-chat",
-        storageBucket: "infoseccompliance-chat.appspot.com",
-        messagingSenderId: "85538751648",
-        appId: "1:85538751648:web:f1a594d9b4d7dfaf9775c5"
-      };
+      let firebaseConfig = {};
 
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const googleProvider = new GoogleAuthProvider();
+      function loadFirebaseConfig() {
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          fetch('/.env.public')
+            .then(response => response.text())
+            .then(text => {
+              const envVars = {};
+              text.split('\n').forEach(line => {
+                const [key, value] = line.split('=');
+                if (key && value) {
+                  envVars[key.trim()] = value.trim();
+                }
+              });
+              
+              firebaseConfig = {
+                apiKey: envVars.AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs,
+                authDomain: envVars.infoseccompliance-chat.firebaseapp.com,
+                projectId: envVars.infoseccompliance-chat,
+                storageBucket: envVars.infoseccompliance-chat.firebasestorage.app,
+                messagingSenderId: envVars.85538751648,
+                appId: envVars.1:85538751648:web:33636b48d1f0751d9775c5
+              };
+              
+              initializeFirebase();
+            })
+            .catch(error => {
+              console.error("Could not load environment variables:", error);
+              if (window.firebaseConfig) {
+                firebaseConfig = window.firebaseConfig;
+                initializeFirebase();
+              } else {
+                console.error("No Firebase config available");
+              }
+            });
+        } else {
+          if (window.firebaseConfig) {
+            firebaseConfig = window.firebaseConfig;
+            initializeFirebase();
+          } else {
+            console.error("No Firebase config available");
+          }
+        }
+      }
 
-      document.getElementById('signInForm').addEventListener('submit', function(event) {
+      function initializeFirebase() {
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const googleProvider = new GoogleAuthProvider();
+        
+        setupAuthListeners(auth, googleProvider);
+      }
+
+      function setupAuthListeners(auth, googleProvider) {
+        document.getElementById('signInForm').addEventListener('submit', function(event) {
           event.preventDefault();
           const email = document.getElementById('signInEmail').value;
           const password = document.getElementById('signInPassword').value;
 
-          // Set a flag in localStorage to indicate we just logged in
           localStorage.setItem('justLoggedIn', 'true');
           
           signInWithEmailAndPassword(auth, email, password)
               .then((userCredential) => {
-                  // Get the user's ID token
                   return userCredential.user.getIdToken(true);
               })
               .then((idToken) => {
-                  // Store the token in localStorage
                   localStorage.setItem('authToken', idToken);
-                  // Redirect to app
                   window.location.href = "https://app.infoseccompliance.chat/";
               })
               .catch((error) => {
                   console.error("Error signing in:", error);
                   alert("Error signing in: " + error.message);
-                  // Clear the flag if login failed
                   localStorage.removeItem('justLoggedIn');
               });
-      });
-      
-      // Simple Google Sign In
-      document.getElementById('googleSignIn').addEventListener('click', function() {
-        const auth = getAuth();
-        const provider = new GoogleAuthProvider();
+        });
         
-        // Set a flag in localStorage to indicate we just logged in
-        localStorage.setItem('justLoggedIn', 'true');
-        
-        signInWithPopup(auth, provider)
-          .then((result) => {
-            console.log("Google sign-in successful");
-            // Get the user's ID token
-            return result.user.getIdToken(true);
-          })
-          .then((idToken) => {
-            // Store the token in localStorage
-            localStorage.setItem('authToken', idToken);
-            console.log("Token stored in localStorage");
-            // Redirect to app
-            window.location.href = "https://app.infoseccompliance.chat/";
-          })
-          .catch((error) => {
-            console.error("Error with Google sign-in:", error);
-            alert("Error signing in with Google: " + error.message);
-            // Clear the flag if login failed
-            localStorage.removeItem('justLoggedIn');
-          });
-      });
+        document.getElementById('googleSignIn').addEventListener('click', function() {
+          localStorage.setItem('justLoggedIn', 'true');
+          
+          signInWithPopup(auth, googleProvider)
+            .then((result) => {
+              console.log("Google sign-in successful");
+              return result.user.getIdToken(true);
+            })
+            .then((idToken) => {
+              localStorage.setItem('authToken', idToken);
+              console.log("Token stored in localStorage");
+              window.location.href = "https://app.infoseccompliance.chat/";
+            })
+            .catch((error) => {
+              console.error("Error with Google sign-in:", error);
+              alert("Error signing in with Google: " + error.message);
+              localStorage.removeItem('justLoggedIn');
+            });
+        });
+      }
+
+      document.addEventListener('DOMContentLoaded', loadFirebaseConfig);
     </script>
 </body>
 </html> 

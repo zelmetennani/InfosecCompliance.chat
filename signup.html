@@ -81,70 +81,99 @@
     <!-- Firebase SDKs -->
     <script src="config.js"></script>
     <script type="module">
-      // Import Firebase modules
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-      import { 
-        getAuth, 
-        createUserWithEmailAndPassword, 
-        GoogleAuthProvider, 
-        signInWithPopup
-      } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
-
-      let app, auth;
-      let firebaseInitialized = false;
-      
-      // Initialize Firebase when config is ready
-      document.addEventListener('firebaseConfigReady', function() {
-          console.log("Initializing Firebase with config:", window.firebaseConfig);
-          try {
-              app = initializeApp(window.firebaseConfig);
-              auth = getAuth(app);
-              firebaseInitialized = true;
-              console.log("Firebase successfully initialized");
-          } catch (error) {
-              console.error("Error initializing Firebase:", error);
-          }
+      document.addEventListener('DOMContentLoaded', function() {
+          // Import Firebase modules
+          import('https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js')
+              .then(module => {
+                  const { initializeApp } = module;
+                  // We'll initialize Firebase after loading config
+                  window.initializeApp = initializeApp;
+                  
+                  return import('https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js');
+              })
+              .then(module => {
+                  const { getAuth, createUserWithEmailAndPassword } = module;
+                  window.getAuth = getAuth;
+                  window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+                  
+                  // Now load the config
+                  loadFirebaseConfig();
+              })
+              .catch(error => {
+                  console.error("Error loading Firebase:", error);
+              });
       });
+    </script>
 
-      // Fallback initialization after a delay if the event doesn't fire
-      setTimeout(() => {
-          if (!firebaseInitialized && window.firebaseConfig) {
-              console.log("Fallback: Initializing Firebase with config:", window.firebaseConfig);
-              try {
-                  app = initializeApp(window.firebaseConfig);
-                  auth = getAuth(app);
-                  firebaseInitialized = true;
-                  console.log("Firebase successfully initialized (fallback)");
-              } catch (error) {
-                  console.error("Error initializing Firebase (fallback):", error);
+    <!-- Replace the hardcoded Firebase config with this -->
+    <script>
+      let firebaseConfig = {};
+
+      // Load Firebase config
+      function loadFirebaseConfig() {
+        // Check if we're in development mode
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          // In development, try to fetch from .env.public
+          fetch('/.env.public')
+            .then(response => response.text())
+            .then(text => {
+              const envVars = {};
+              text.split('\n').forEach(line => {
+                const [key, value] = line.split('=');
+                if (key && value) {
+                  envVars[key.trim()] = value.trim();
+                }
+              });
+              
+              firebaseConfig = {
+                apiKey: envVars.AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs,
+                authDomain: envVars.infoseccompliance-chat.firebaseapp.com,
+                projectId: envVars.infoseccompliance-chat,
+                storageBucket: envVars.infoseccompliance-chat.firebasestorage.app,
+                messagingSenderId: envVars.85538751648,
+                appId: envVars.1:85538751648:web:33636b48d1f0751d9775c5
+              };
+              
+              initializeFirebase();
+            })
+            .catch(error => {
+              console.error("Could not load environment variables:", error);
+              // Use config from config.js if available
+              if (window.firebaseConfig) {
+                firebaseConfig = window.firebaseConfig;
+                initializeFirebase();
+              } else {
+                console.error("No Firebase config available");
               }
+            });
+        } else {
+          // In production, use config from config.js
+          if (window.firebaseConfig) {
+            firebaseConfig = window.firebaseConfig;
+            initializeFirebase();
+          } else {
+            console.error("No Firebase config available");
           }
-      }, 2000);
+        }
+      }
 
-      document.getElementById('signUpForm').addEventListener('submit', function(event) {
+      // Initialize Firebase with config
+      function initializeFirebase() {
+        const app = window.initializeApp(firebaseConfig);
+        const auth = window.getAuth(app);
+        
+        // Set up event listeners and other functionality
+        setupAuthListeners(auth);
+      }
+
+      // Set up auth listeners
+      function setupAuthListeners(auth) {
+        document.getElementById('signUpForm').addEventListener('submit', function(event) {
           event.preventDefault();
           const email = document.getElementById('signUpEmail').value;
           const password = document.getElementById('signUpPassword').value;
-
-          // Wait for Firebase to initialize if it hasn't already
-          if (!firebaseInitialized) {
-              console.log("Firebase not initialized yet, waiting...");
-              setTimeout(() => {
-                  if (firebaseInitialized) {
-                      console.log("Firebase now initialized, proceeding with sign up");
-                      processSignUp(email, password);
-                  } else {
-                      console.error("Firebase still not initialized after waiting");
-                      alert("Error: Firebase not initialized. Please try again in a moment.");
-                  }
-              }, 3000);
-          } else {
-              processSignUp(email, password);
-          }
-      });
-      
-      function processSignUp(email, password) {
-          createUserWithEmailAndPassword(auth, email, password)
+          
+          window.createUserWithEmailAndPassword(auth, email, password)
               .then((userCredential) => {
                   // Show success popup
                   document.getElementById('successPopup').style.display = 'flex';
@@ -156,34 +185,13 @@
                   console.error("Error signing up:", error);
                   alert("Error signing up: " + error.message);
               });
+        });
+        
+        // Close button functionality
+        document.querySelector('.close-button').addEventListener('click', function() {
+            document.getElementById('successPopup').style.display = 'none';
+        });
       }
-      
-      // Close button functionality
-      document.querySelector('.close-button').addEventListener('click', function() {
-          document.getElementById('successPopup').style.display = 'none';
-      });
-
-      // Update the Google Sign Up functionality
-      document.getElementById('googleSignUp').addEventListener('click', function() {
-        // Get the existing Firebase auth instance
-        const auth = getAuth();
-        const provider = new GoogleAuthProvider();
-        
-        // Set a flag in localStorage to indicate this is a new signup
-        localStorage.setItem('newSignup', 'true');
-        
-        signInWithPopup(auth, provider)
-          .then((result) => {
-            console.log("Google sign-up successful");
-            document.getElementById('successPopup').style.display = 'flex';
-          })
-          .catch((error) => {
-            console.error("Error with Google sign-up:", error);
-            alert("Error signing up with Google: " + error.message);
-            // Clear the flag if signup failed
-            localStorage.removeItem('newSignup');
-          });
-      });
     </script>
 
     <script>
@@ -233,62 +241,6 @@
       // Manually handle the password input
       const passwordInput = document.getElementById('signUpPassword');
       passwordInput.value = ''; // Clear any initial value
-
-      // For Firebase, let's try a completely different approach
-      // Add this to the bottom of your page
-      document.addEventListener('DOMContentLoaded', function() {
-          // Hardcoded Firebase config for testing
-          const firebaseConfig = {
-              apiKey: "AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs",
-              authDomain: "infoseccompliance-chat.firebaseapp.com",
-              projectId: "infoseccompliance-chat",
-              storageBucket: "infoseccompliance-chat.firebasestorage.app",
-              messagingSenderId: "85538751648",
-              appId: "1:85538751648:web:33636b48d1f0751d9775c5",
-              measurementId: "G-T8PJLE1Q4X"
-          };
-          
-          // Initialize Firebase directly
-          import('https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js')
-              .then(module => {
-                  const { initializeApp } = module;
-                  const app = initializeApp(firebaseConfig);
-                  
-                  return import('https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js');
-              })
-              .then(module => {
-                  const { getAuth, createUserWithEmailAndPassword } = module;
-                  const auth = getAuth();
-                  
-                  // Set up form submission
-                  document.getElementById('signUpForm').addEventListener('submit', function(event) {
-                      event.preventDefault();
-                      const email = document.getElementById('signUpEmail').value;
-                      const password = document.getElementById('signUpPassword').value;
-                      
-                      createUserWithEmailAndPassword(auth, email, password)
-                          .then((userCredential) => {
-                              // Show success popup
-                              document.getElementById('successPopup').style.display = 'flex';
-                              
-                              // Clear the form
-                              document.getElementById('signUpForm').reset();
-                          })
-                          .catch((error) => {
-                              console.error("Error signing up:", error);
-                              alert("Error signing up: " + error.message);
-                          });
-                  });
-                  
-                  // Close button functionality
-                  document.querySelector('.close-button').addEventListener('click', function() {
-                      document.getElementById('successPopup').style.display = 'none';
-                  });
-              })
-              .catch(error => {
-                  console.error("Error loading Firebase:", error);
-              });
-      });
     </script>
 </body>
 </html> 
