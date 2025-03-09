@@ -84,63 +84,30 @@
       import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
       import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
       
-      let firebaseConfig = {};
+      let app, auth;
       
-      function loadFirebaseConfig() {
-        // Check if we're in development mode
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-          // In development, try to fetch from .env.public
-          fetch('/.env.public')
-            .then(response => response.text())
-            .then(text => {
-              const envVars = {};
-              text.split('\n').forEach(line => {
-                const [key, value] = line.split('=');
-                if (key && value) {
-                  envVars[key.trim()] = value.trim();
-                }
-              });
-              
-              firebaseConfig = {
-                apiKey: envVars.AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs,
-                authDomain: envVars.infoseccompliance-chat.firebaseapp.com,
-                projectId: envVars.infoseccompliance-chat,
-                storageBucket: envVars.infoseccompliance-chat.firebasestorage.app,
-                messagingSenderId: envVars.85538751648,
-                appId: envVars.1:85538751648:web:33636b48d1f0751d9775c5
-              };
-              
-              initializeFirebase();
-            })
-            .catch(error => {
-              console.error("Could not load environment variables:", error);
-              // Use config from config.js if available
-              if (window.firebaseConfig) {
-                firebaseConfig = window.firebaseConfig;
-                initializeFirebase();
-              } else {
-                console.error("No Firebase config available");
-              }
-            });
-        } else {
-          // In production, use config from config.js
-          if (window.firebaseConfig) {
-            firebaseConfig = window.firebaseConfig;
-            initializeFirebase();
-          } else {
-            console.error("No Firebase config available");
+      // Listen for the firebaseConfigReady event from config.js
+      document.addEventListener('firebaseConfigReady', function() {
+        try {
+          // Check if the config has placeholders
+          if (window.firebaseConfig.apiKey.includes('##AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs##')) {
+            console.error("Firebase config contains placeholders. GitHub Actions didn't replace the values.");
+            alert("Application configuration error. Please contact support.");
+            return;
           }
+          
+          // Initialize Firebase with the config from config.js
+          app = initializeApp(window.firebaseConfig);
+          auth = getAuth(app);
+          console.log("Firebase initialized successfully");
+          
+          // Set up event listeners
+          setupAuthListeners(auth);
+        } catch (error) {
+          console.error("Error initializing Firebase:", error);
+          alert("Error initializing application. Please try again later.");
         }
-      }
-      
-      // Initialize Firebase with config
-      function initializeFirebase() {
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        
-        // Set up event listeners and other functionality
-        setupAuthListeners(auth);
-      }
+      });
       
       // Set up auth listeners
       function setupAuthListeners(auth) {
@@ -151,61 +118,23 @@
           
           createUserWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
-                // Show success popup
-                document.getElementById('successPopup').style.display = 'flex';
-                
-                // Clear the form
-                document.getElementById('signUpForm').reset();
+              // Show success popup
+              document.getElementById('successPopup').style.display = 'flex';
+              
+              // Clear the form
+              document.getElementById('signUpForm').reset();
             })
             .catch((error) => {
-                console.error("Error signing up:", error);
-                alert("Error signing up: " + error.message);
+              console.error("Error signing up:", error);
+              alert("Error signing up: " + error.message);
             });
         });
         
         // Close button functionality
         document.querySelector('.close-button').addEventListener('click', function() {
-            document.getElementById('successPopup').style.display = 'none';
+          document.getElementById('successPopup').style.display = 'none';
         });
       }
-      
-      // Call this function to start loading Firebase config
-      document.addEventListener('DOMContentLoaded', loadFirebaseConfig);
-    </script>
-
-    <script>
-      // Debug: Check if Firebase config is properly set
-      window.addEventListener('DOMContentLoaded', function() {
-        console.log("Current Firebase config:", window.firebaseConfig);
-        
-        // Check if API key looks valid
-        if (window.firebaseConfig && window.firebaseConfig.apiKey) {
-          if (window.firebaseConfig.apiKey.includes("AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs") || 
-              window.firebaseConfig.apiKey.includes("##AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs##")) {
-            console.error("Firebase API key placeholder not replaced!");
-          } else {
-            console.log("Firebase API key appears to be set correctly");
-          }
-        } else {
-          console.error("Firebase API key is missing!");
-        }
-      });
-    </script>
-
-    <!-- Add this at the bottom of your script section -->
-    <script>
-      document.getElementById('signUpPassword').addEventListener('input', function(event) {
-          console.log('Password input event fired');
-      });
-
-      document.getElementById('signUpPassword').addEventListener('keydown', function(event) {
-          console.log('Password keydown event fired, key:', event.key);
-      });
-
-      // Check for any errors that might be preventing input
-      window.addEventListener('error', function(event) {
-          console.error('Global error caught:', event.error);
-      });
     </script>
 
     <!-- Password field handling -->

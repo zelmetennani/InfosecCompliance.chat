@@ -6,7 +6,7 @@ if (window.firebaseConfigInitialized) {
     
     console.log("Starting Firebase config initialization");
     
-    // For production environment - this will be replaced by GitHub Actions
+    // For production environment - these placeholders will be replaced by GitHub Actions
     window.firebaseConfig = {
         apiKey: "AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs",
         authDomain: "infoseccompliance-chat.firebaseapp.com",
@@ -19,25 +19,20 @@ if (window.firebaseConfigInitialized) {
     
     console.log("Firebase config set:", window.firebaseConfig);
     
-    // Load environment variables from .env file in development
+    // Check if we're in development mode
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-        console.log("Running in development mode, attempting to load .env file");
+        console.log("Running in development mode");
+        // In development, try to fetch from .env file
         fetch('/.env')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Failed to load .env file: ${response.status}`);
-                }
-                return response.text();
-            })
+            .then(response => response.text())
             .then(text => {
-                console.log("Successfully loaded .env file");
-                const envVars = text.split('\n').reduce((acc, line) => {
+                const envVars = {};
+                text.split('\n').forEach(line => {
                     const [key, value] = line.split('=');
                     if (key && value) {
-                        acc[key.trim()] = value.trim();
+                        envVars[key.trim()] = value.trim();
                     }
-                    return acc;
-                }, {});
+                });
                 
                 window.firebaseConfig = {
                     apiKey: envVars.FIREBASE_API_KEY,
@@ -49,7 +44,7 @@ if (window.firebaseConfigInitialized) {
                     measurementId: envVars.FIREBASE_MEASUREMENT_ID
                 };
                 
-                console.log("Firebase config loaded from .env:", window.firebaseConfig);
+                console.log("Firebase config loaded from .env");
                 
                 // Initialize Firebase after config is loaded
                 initializeFirebase();
