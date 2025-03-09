@@ -57,15 +57,6 @@ if (window.firebaseConfigInitialized) {
         // Check if placeholders were replaced
         if (window.firebaseConfig.apiKey.includes('AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs')) {
             console.error("Firebase configuration placeholders not replaced!");
-            // For testing only - remove in production
-            window.firebaseConfig = {
-                apiKey: "AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs",
-                authDomain: "infoseccompliance-chat.firebaseapp.com",
-                projectId: "infoseccompliance-chat",
-                storageBucket: "infoseccompliance-chat.appspot.com",
-                messagingSenderId: "85538751648",
-                appId: "1:85538751648:web:f1a594d9b4d7dfaf9775c5"
-            };
         }
         
         console.log("Firebase config ready");
