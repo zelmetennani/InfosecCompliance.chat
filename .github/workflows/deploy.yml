@@ -14,6 +14,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
+      - name: Verify Secrets
+        run: |
+          if [ -z "${{ secrets.FIREBASE_API_KEY }}" ]; then
+            echo "Error: FIREBASE_API_KEY is not set in repository secrets"
+            exit 1
+          fi
+          if [ -z "${{ secrets.FIREBASE_AUTH_DOMAIN }}" ]; then
+            echo "Error: FIREBASE_AUTH_DOMAIN is not set in repository secrets"
+            exit 1
+          fi
+          echo "All required secrets are set"
+
       - name: Update Firebase Config
         env:
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
@@ -23,30 +35,26 @@ jobs:
           FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
         run: |
-          # Debug - print the first few characters of each secret to verify they're set
-          echo "API Key starts with: ${FIREBASE_API_KEY:0:4}..."
-          echo "Auth Domain starts with: ${FIREBASE_AUTH_DOMAIN:0:10}..."
-          
           # Update signin.html with Firebase config
-          sed -i "s|##FIREBASE_API_KEY##|$FIREBASE_API_KEY|g" signin.html
-          sed -i "s|##FIREBASE_AUTH_DOMAIN##|$FIREBASE_AUTH_DOMAIN|g" signin.html
-          sed -i "s|##FIREBASE_PROJECT_ID##|$FIREBASE_PROJECT_ID|g" signin.html
-          sed -i "s|##FIREBASE_STORAGE_BUCKET##|$FIREBASE_STORAGE_BUCKET|g" signin.html
-          sed -i "s|##FIREBASE_MESSAGING_SENDER_ID##|$FIREBASE_MESSAGING_SENDER_ID|g" signin.html
-          sed -i "s|##FIREBASE_APP_ID##|$FIREBASE_APP_ID|g" signin.html
+          sed -i 's|"##FIREBASE_API_KEY##"|"'"$FIREBASE_API_KEY"'"|g' signin.html
+          sed -i 's|"##FIREBASE_AUTH_DOMAIN##"|"'"$FIREBASE_AUTH_DOMAIN"'"|g' signin.html
+          sed -i 's|"##FIREBASE_PROJECT_ID##"|"'"$FIREBASE_PROJECT_ID"'"|g' signin.html
+          sed -i 's|"##FIREBASE_STORAGE_BUCKET##"|"'"$FIREBASE_STORAGE_BUCKET"'"|g' signin.html
+          sed -i 's|"##FIREBASE_MESSAGING_SENDER_ID##"|"'"$FIREBASE_MESSAGING_SENDER_ID"'"|g' signin.html
+          sed -i 's|"##FIREBASE_APP_ID##"|"'"$FIREBASE_APP_ID"'"|g' signin.html
           
           # Update signup.html with Firebase config
-          sed -i "s|##FIREBASE_API_KEY##|$FIREBASE_API_KEY|g" signup.html
-          sed -i "s|##FIREBASE_AUTH_DOMAIN##|$FIREBASE_AUTH_DOMAIN|g" signup.html
-          sed -i "s|##FIREBASE_PROJECT_ID##|$FIREBASE_PROJECT_ID|g" signup.html
-          sed -i "s|##FIREBASE_STORAGE_BUCKET##|$FIREBASE_STORAGE_BUCKET|g" signup.html
-          sed -i "s|##FIREBASE_MESSAGING_SENDER_ID##|$FIREBASE_MESSAGING_SENDER_ID|g" signup.html
-          sed -i "s|##FIREBASE_APP_ID##|$FIREBASE_APP_ID|g" signup.html
+          sed -i 's|"##FIREBASE_API_KEY##"|"'"$FIREBASE_API_KEY"'"|g' signup.html
+          sed -i 's|"##FIREBASE_AUTH_DOMAIN##"|"'"$FIREBASE_AUTH_DOMAIN"'"|g' signup.html
+          sed -i 's|"##FIREBASE_PROJECT_ID##"|"'"$FIREBASE_PROJECT_ID"'"|g' signup.html
+          sed -i 's|"##FIREBASE_STORAGE_BUCKET##"|"'"$FIREBASE_STORAGE_BUCKET"'"|g' signup.html
+          sed -i 's|"##FIREBASE_MESSAGING_SENDER_ID##"|"'"$FIREBASE_MESSAGING_SENDER_ID"'"|g' signup.html
+          sed -i 's|"##FIREBASE_APP_ID##"|"'"$FIREBASE_APP_ID"'"|g' signup.html
           
-          # Verify the replacements worked
+          # Verify the replacements worked (without showing the full values)
           echo "Checking if replacements were successful:"
-          grep -o "apiKey: \"[^\"]*\"" signin.html | head -1
-          grep -o "apiKey: \"[^\"]*\"" signup.html | head -1
+          grep -o "apiKey: \"[^\"]*\"" signin.html | sed 's/\(apiKey: "[^"]\{4\}\).*/\1..."/g'
+          grep -o "apiKey: \"[^\"]*\"" signup.html | sed 's/\(apiKey: "[^"]\{4\}\).*/\1..."/g'
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
