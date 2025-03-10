@@ -76,6 +76,16 @@
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         
+        // Debug Firebase initialization
+        console.log("Firebase config:", {
+            apiKey: firebaseConfig.apiKey.substring(0, 4) + "...",
+            authDomain: firebaseConfig.authDomain,
+            projectId: firebaseConfig.projectId
+        });
+        
+        // Check if Firebase Auth is available
+        console.log("Firebase Auth available:", !!firebase.auth);
+        
         // Email/Password Sign In
         document.getElementById('signInForm').addEventListener('submit', function(event) {
             event.preventDefault();
