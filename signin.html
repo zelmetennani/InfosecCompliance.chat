@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Sign in to Infosec Compliance Chat - AI-powered compliance insights">
-    <title>1 Sign In - Infosec Compliance Chat</title>
+    <title>Sign In - Infosec Compliance Chat</title>
     <link rel="icon" href="/favicon/favicon.ico">
     <link rel="stylesheet" href="styles.css">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <!-- Add config.js for local development -->
+    <script src="config.js"></script>
 </head>
 <body>
     <nav class="navbar">
@@ -63,83 +65,77 @@
     </main>
 
     <script>
-        // Firebase configuration with placeholders for GitHub Actions to replace
-        const firebaseConfig = {
-            apiKey: "AIzaSyALZWouXQCdO49GYYA5NTaeESVDcBHmZGs",
-            authDomain: "infoseccompliance-chat.firebaseapp.com",
-            projectId: "infoseccompliance-chat",
-            storageBucket: "infoseccompliance-chat.firebasestorage.app",
-            messagingSenderId: "85538751648",
-            appId: "1:85538751648:web:33636b48d1f0751d9775c5"
-        };
-
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        
-        // Debug Firebase initialization
-        console.log("Firebase config:", {
-            apiKey: firebaseConfig.apiKey.substring(0, 4) + "...",
-            authDomain: firebaseConfig.authDomain,
-            projectId: firebaseConfig.projectId
-        });
-        
-        // Check if Firebase Auth is available
-        console.log("Firebase Auth available:", !!firebase.auth);
-        
-        // Email/Password Sign In
-        document.getElementById('signInForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            const email = document.getElementById('signInEmail').value;
-            const password = document.getElementById('signInPassword').value;
+        // Wait for Firebase config to be ready
+        document.addEventListener('firebaseConfigReady', function() {
+            // Initialize Firebase with the config from config.js
+            firebase.initializeApp(window.firebaseConfig);
             
-            // Set a flag in localStorage to indicate we just logged in
-            localStorage.setItem('justLoggedIn', 'true');
-            
-            firebase.auth().signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    return userCredential.user.getIdToken(true);
-                })
-                .then((idToken) => {
-                    localStorage.setItem('authToken', idToken);
-                    window.location.href = "https://app.infoseccompliance.chat/";
-                })
-                .catch((error) => {
-                    console.error("Error signing in:", error);
-                    alert("Error signing in: " + error.message);
-                    // Clear the flag if login failed
-                    localStorage.removeItem('justLoggedIn');
-                });
-        });
-
-        // Google Sign In
-        document.getElementById('googleSignIn').addEventListener('click', function() {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            
-            // Set additional scopes and custom parameters
-            provider.addScope('profile');
-            provider.addScope('email');
-            provider.setCustomParameters({
-                'prompt': 'select_account'
+            console.log("Firebase initialized with config:", {
+                apiKey: window.firebaseConfig.apiKey.substring(0, 4) + "...",
+                authDomain: window.firebaseConfig.authDomain,
+                projectId: window.firebaseConfig.projectId
             });
             
-            // Set a flag in localStorage to indicate we just logged in
-            localStorage.setItem('justLoggedIn', 'true');
-            
-            firebase.auth().signInWithPopup(provider)
-                .then((result) => {
-                    return result.user.getIdToken(true);
-                })
-                .then((idToken) => {
-                    localStorage.setItem('authToken', idToken);
-                    window.location.href = "https://app.infoseccompliance.chat/";
-                })
-                .catch((error) => {
-                    console.error("Error with Google sign-in:", error);
-                    alert("Error signing in with Google: " + error.message);
-                    // Clear the flag if login failed
-                    localStorage.removeItem('justLoggedIn');
-                });
+            // Rest of your Firebase code...
+            setupAuthListeners();
         });
+        
+        function setupAuthListeners() {
+            // Email/Password Sign In
+            document.getElementById('signInForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                const email = document.getElementById('signInEmail').value;
+                const password = document.getElementById('signInPassword').value;
+                
+                // Set a flag in localStorage to indicate we just logged in
+                localStorage.setItem('justLoggedIn', 'true');
+                
+                firebase.auth().signInWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        return userCredential.user.getIdToken(true);
+                    })
+                    .then((idToken) => {
+                        localStorage.setItem('authToken', idToken);
+                        window.location.href = "https://app.infoseccompliance.chat/";
+                    })
+                    .catch((error) => {
+                        console.error("Error signing in:", error);
+                        alert("Error signing in: " + error.message);
+                        // Clear the flag if login failed
+                        localStorage.removeItem('justLoggedIn');
+                    });
+            });
+
+            // Google Sign In
+            document.getElementById('googleSignIn').addEventListener('click', function() {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                
+                // Set additional scopes and custom parameters
+                provider.addScope('profile');
+                provider.addScope('email');
+                provider.setCustomParameters({
+                    'prompt': 'select_account'
+                });
+                
+                // Set a flag in localStorage to indicate we just logged in
+                localStorage.setItem('justLoggedIn', 'true');
+                
+                firebase.auth().signInWithPopup(provider)
+                    .then((result) => {
+                        return result.user.getIdToken(true);
+                    })
+                    .then((idToken) => {
+                        localStorage.setItem('authToken', idToken);
+                        window.location.href = "https://app.infoseccompliance.chat/";
+                    })
+                    .catch((error) => {
+                        console.error("Error with Google sign-in:", error);
+                        alert("Error signing in with Google: " + error.message);
+                        // Clear the flag if login failed
+                        localStorage.removeItem('justLoggedIn');
+                    });
+            });
+        }
     </script>
 </body>
 </html> 
