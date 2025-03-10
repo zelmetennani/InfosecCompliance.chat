@@ -6,6 +6,7 @@ Thumbs.db
 .env
 .env.local
 .env.*.local
+env.js
 
 # Editor directories and files
 .idea/
