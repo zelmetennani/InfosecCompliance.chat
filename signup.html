@@ -110,6 +110,16 @@
         document.getElementById('googleSignUp').addEventListener('click', function() {
             const provider = new firebase.auth.GoogleAuthProvider();
             
+            // Set additional scopes and custom parameters
+            provider.addScope('profile');
+            provider.addScope('email');
+            provider.setCustomParameters({
+                'prompt': 'select_account'
+            });
+            
+            // Set a flag in localStorage to indicate this is a new signup
+            localStorage.setItem('newSignup', 'true');
+            
             firebase.auth().signInWithPopup(provider)
                 .then((result) => {
                     // Check if this is a new user
@@ -129,6 +139,8 @@
                 .catch((error) => {
                     console.error("Error with Google sign-up:", error);
                     alert("Error signing up with Google: " + error.message);
+                    // Clear the flag if signup failed
+                    localStorage.removeItem('newSignup');
                 });
         });
         

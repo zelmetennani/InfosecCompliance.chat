@@ -23,20 +23,30 @@ jobs:
           FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
         run: |
-          # Update signin.html and signup.html with Firebase config
-          sed -i "s/##FIREBASE_API_KEY##/$FIREBASE_API_KEY/g" signin.html
-          sed -i "s/##FIREBASE_AUTH_DOMAIN##/$FIREBASE_AUTH_DOMAIN/g" signin.html
-          sed -i "s/##FIREBASE_PROJECT_ID##/$FIREBASE_PROJECT_ID/g" signin.html
-          sed -i "s/##FIREBASE_STORAGE_BUCKET##/$FIREBASE_STORAGE_BUCKET/g" signin.html
-          sed -i "s/##FIREBASE_MESSAGING_SENDER_ID##/$FIREBASE_MESSAGING_SENDER_ID/g" signin.html
-          sed -i "s/##FIREBASE_APP_ID##/$FIREBASE_APP_ID/g" signin.html
+          # Debug - print the first few characters of each secret to verify they're set
+          echo "API Key starts with: ${FIREBASE_API_KEY:0:4}..."
+          echo "Auth Domain starts with: ${FIREBASE_AUTH_DOMAIN:0:10}..."
           
-          sed -i "s/##FIREBASE_API_KEY##/$FIREBASE_API_KEY/g" signup.html
-          sed -i "s/##FIREBASE_AUTH_DOMAIN##/$FIREBASE_AUTH_DOMAIN/g" signup.html
-          sed -i "s/##FIREBASE_PROJECT_ID##/$FIREBASE_PROJECT_ID/g" signup.html
-          sed -i "s/##FIREBASE_STORAGE_BUCKET##/$FIREBASE_STORAGE_BUCKET/g" signup.html
-          sed -i "s/##FIREBASE_MESSAGING_SENDER_ID##/$FIREBASE_MESSAGING_SENDER_ID/g" signup.html
-          sed -i "s/##FIREBASE_APP_ID##/$FIREBASE_APP_ID/g" signup.html
+          # Update signin.html with Firebase config
+          sed -i "s|##FIREBASE_API_KEY##|$FIREBASE_API_KEY|g" signin.html
+          sed -i "s|##FIREBASE_AUTH_DOMAIN##|$FIREBASE_AUTH_DOMAIN|g" signin.html
+          sed -i "s|##FIREBASE_PROJECT_ID##|$FIREBASE_PROJECT_ID|g" signin.html
+          sed -i "s|##FIREBASE_STORAGE_BUCKET##|$FIREBASE_STORAGE_BUCKET|g" signin.html
+          sed -i "s|##FIREBASE_MESSAGING_SENDER_ID##|$FIREBASE_MESSAGING_SENDER_ID|g" signin.html
+          sed -i "s|##FIREBASE_APP_ID##|$FIREBASE_APP_ID|g" signin.html
+          
+          # Update signup.html with Firebase config
+          sed -i "s|##FIREBASE_API_KEY##|$FIREBASE_API_KEY|g" signup.html
+          sed -i "s|##FIREBASE_AUTH_DOMAIN##|$FIREBASE_AUTH_DOMAIN|g" signup.html
+          sed -i "s|##FIREBASE_PROJECT_ID##|$FIREBASE_PROJECT_ID|g" signup.html
+          sed -i "s|##FIREBASE_STORAGE_BUCKET##|$FIREBASE_STORAGE_BUCKET|g" signup.html
+          sed -i "s|##FIREBASE_MESSAGING_SENDER_ID##|$FIREBASE_MESSAGING_SENDER_ID|g" signup.html
+          sed -i "s|##FIREBASE_APP_ID##|$FIREBASE_APP_ID|g" signup.html
+          
+          # Verify the replacements worked
+          echo "Checking if replacements were successful:"
+          grep -o "apiKey: \"[^\"]*\"" signin.html | head -1
+          grep -o "apiKey: \"[^\"]*\"" signup.html | head -1
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
