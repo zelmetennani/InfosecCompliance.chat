@@ -69,7 +69,7 @@
         </section>
 
         <footer>
-            <p>©2023 Infosec Compliance Chat. All rights reserved.</p>
+            <p>©2025 Infosec Compliance Chat. All rights reserved.</p>
         </footer>
     </main>
 
@@ -83,7 +83,7 @@
             messagingSenderId: "85538751648",
             appId: "1:85538751648:web:33636b48d1f0751d9775c5"
         };
-        
+
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         
@@ -93,11 +93,8 @@
             const email = document.getElementById('signUpEmail').value;
             const password = document.getElementById('signUpPassword').value;
             
-            console.log("Attempting to create account with email:", email);
-            
             firebase.auth().createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
-                    console.log("Account created successfully");
                     // Show success popup
                     document.getElementById('successPopup').style.display = 'flex';
                     // Clear the form
@@ -111,13 +108,10 @@
         
         // Google Sign Up
         document.getElementById('googleSignUp').addEventListener('click', function() {
-            console.log("Google sign-up button clicked");
-            
             const provider = new firebase.auth.GoogleAuthProvider();
             
             firebase.auth().signInWithPopup(provider)
                 .then((result) => {
-                    console.log("Google sign-up successful");
                     // Check if this is a new user
                     const isNewUser = result.additionalUserInfo.isNewUser;
                     
