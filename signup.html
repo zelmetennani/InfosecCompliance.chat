@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Sign up for Infosec Compliance Chat - AI-powered compliance insights">
-    <title>3Sign Up - Infosec Compliance Chat</title>
+    <title>4Sign Up - Infosec Compliance Chat</title>
     <link rel="icon" href="/favicon/favicon.ico">
     <link rel="stylesheet" href="styles.css">
     
@@ -101,7 +101,7 @@
                 projectId: window.firebaseConfig.projectId
             });
             
-            // Rest of your Firebase code...
+            // Set up auth listeners after Firebase is initialized
             setupAuthListeners();
         });
         
@@ -125,9 +125,14 @@
                     });
             });
             
-            // Google Sign Up with redirect method
-            document.getElementById('googleSignUp').addEventListener('click', function(event) {
-                console.log("Google sign-up button clicked");
+            // IMPORTANT: Remove any existing click handlers from the Google button
+            const googleButton = document.getElementById('googleSignUp');
+            const newGoogleButton = googleButton.cloneNode(true);
+            googleButton.parentNode.replaceChild(newGoogleButton, googleButton);
+            
+            // Google Sign Up with popup method
+            newGoogleButton.addEventListener('click', function(event) {
+                console.log("Google sign-up button clicked - ACTUAL HANDLER");
                 event.preventDefault(); // Prevent any default behavior
                 
                 try {
@@ -142,17 +147,36 @@
                     });
                     console.log("Google provider configured with scopes and parameters");
                     
-                    // Set a flag in localStorage to indicate this is a new signup
-                    localStorage.setItem('newSignup', 'true');
-                    
-                    console.log("Attempting Google sign-in redirect...");
-                    firebase.auth().signInWithRedirect(provider)
+                    // Try popup first
+                    console.log("Attempting Google sign-in popup...");
+                    firebase.auth().signInWithPopup(provider)
+                        .then((result) => {
+                            console.log("Google sign-in successful", result);
+                            // Check if this is a new user
+                            const isNewUser = result.additionalUserInfo.isNewUser;
+                            console.log("Is new user:", isNewUser);
+                            
+                            if (isNewUser) {
+                                // Show success popup for new users
+                                console.log("Showing success popup for new user");
+                                document.getElementById('successPopup').style.display = 'flex';
+                            } else {
+                                // Redirect existing users to the app
+                                console.log("Redirecting existing user to app");
+                                return result.user.getIdToken(true).then(idToken => {
+                                    localStorage.setItem('authToken', idToken);
+                                    window.location.href = "https://app.infoseccompliance.chat/";
+                                });
+                            }
+                        })
                         .catch((error) => {
-                            console.error("Error with Google sign-up redirect:", error);
+                            console.error("Error with Google sign-in popup:", error);
                             console.error("Error code:", error.code);
                             console.error("Error message:", error.message);
-                            alert("Error signing up with Google: " + error.message);
-                            localStorage.removeItem('newSignup');
+                            
+                            // If popup fails, fall back to redirect
+                            console.log("Falling back to redirect method...");
+                            firebase.auth().signInWithRedirect(provider);
                         });
                 } catch (error) {
                     console.error("Exception during Google sign-up setup:", error);
@@ -191,20 +215,6 @@
                 document.getElementById('successPopup').style.display = 'none';
             });
         }
-
-        // Add this at the beginning of your script
-        document.addEventListener('DOMContentLoaded', function() {
-            const googleButton = document.getElementById('googleSignUp');
-            if (googleButton) {
-                console.log("Google button found in DOM");
-                googleButton.addEventListener('click', function() {
-                    console.log("Basic click handler triggered");
-                    alert("Button clicked!");
-                });
-            } else {
-                console.error("Google button not found in DOM");
-            }
-        });
     </script>
 </body>
 </html> 
