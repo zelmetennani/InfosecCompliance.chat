@@ -90,11 +90,8 @@
             console.log("Firebase SDK is loaded");
         }
         
-        // Wait for Firebase config to be ready
-        document.addEventListener('firebaseConfigReady', function() {
-            // Initialize Firebase with the config from config.js
-            firebase.initializeApp(window.firebaseConfig);
-            
+        // Wait for Firebase to be ready
+        document.addEventListener('firebaseReady', function() {
             console.log("Firebase initialized with config:", {
                 apiKey: window.firebaseConfig.apiKey.substring(0, 4) + "...",
                 authDomain: window.firebaseConfig.authDomain,
