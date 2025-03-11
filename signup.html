@@ -128,39 +128,43 @@
             });
             
             // SIMPLIFIED Google Sign Up - direct approach
-            document.getElementById('googleSignUp').onclick = function(event) {
-                event.preventDefault();
-                console.log("Google sign-up button clicked - SIMPLIFIED HANDLER");
+            document.getElementById('googleSignUp').onclick = function() {
+                console.log("Google sign-up button clicked");
                 
-                // Show visual feedback
+                // Show loading state
                 this.disabled = true;
-                this.innerHTML = '<span>Connecting to Google...</span>';
+                this.innerHTML = 'Connecting...';
                 
-                try {
-                    // Basic Google provider
-                    const provider = new firebase.auth.GoogleAuthProvider();
-                    console.log("Google provider created");
-                    
-                    // Try the redirect method (more reliable)
-                    console.log("Starting Google sign-in with redirect");
-                    firebase.auth().signInWithRedirect(provider)
-                        .then(() => {
-                            console.log("Redirect initiated successfully");
+                // Create a new instance of the Google provider
+                const provider = new firebase.auth.GoogleAuthProvider();
+                
+                // Use signInWithPopup with a timeout
+                setTimeout(() => {
+                    firebase.auth().signInWithPopup(provider)
+                        .then(result => {
+                            console.log("Google sign-in successful:", result.user.email);
+                            
+                            // Check if this is a new user
+                            const isNewUser = result.additionalUserInfo?.isNewUser;
+                            if (isNewUser) {
+                                document.getElementById('successPopup').style.display = 'flex';
+                            } else {
+                                // Get the token and redirect
+                                return result.user.getIdToken(true).then(idToken => {
+                                    localStorage.setItem('authToken', idToken);
+                                    window.location.href = "https://app.infoseccompliance.chat/";
+                                });
+                            }
                         })
                         .catch(error => {
-                            console.error("Error starting redirect:", error);
-                            alert("Error: " + error.message);
+                            console.error("Google sign-in error:", error);
+                            alert("Error signing in with Google: " + error.message);
+                            
+                            // Reset button
                             this.disabled = false;
                             this.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="google-icon">Sign up with Google';
                         });
-                } catch (error) {
-                    console.error("Exception in Google sign-up:", error);
-                    alert("Error: " + error.message);
-                    this.disabled = false;
-                    this.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="google-icon">Sign up with Google';
-                }
-                
-                return false;
+                }, 1000);
             };
             
             // Handle redirect result on page load
