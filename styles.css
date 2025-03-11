@@ -140,6 +140,27 @@ footer {
     .waitlist-section {
         padding: 1.5rem;
     }
+    
+    .form-group input {
+        font-size: 16px;
+        padding: 12px;
+    }
+    
+    .cta-button, 
+    .google-button {
+        padding: 12px 16px;
+        min-height: 48px;
+    }
+    
+    .google-button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .google-icon {
+        margin-right: 8px;
+    }
 }
 
 .auth-buttons {
@@ -318,22 +339,6 @@ input[type="password"]:focus {
     padding: 4rem 0;
 }
 
-@media (max-width: 768px) {
-    .hero-buttons {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .nav-content {
-        padding: 0 1rem;
-    }
-    
-    .features-grid {
-        grid-template-columns: 1fr;
-        padding: 0 1rem;
-    }
-}
-
 /* Notification Popup */
 .notification-popup {
     display: none;
@@ -489,4 +494,58 @@ input[type="password"]:focus {
     padding: 0 10px;
     color: #757575;
     font-size: 0.875rem;
+}
+
+/* Loading spinner */
+.spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Error message styling */
+.error-message {
+    color: #721c24;
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 4px;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Success animation */
+@keyframes successPulse {
+    0% { transform: scale(0.95); }
+    70% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.success-icon {
+    animation: successPulse 0.5s ease-in-out;
+}
+
+/* Button states */
+.cta-button:disabled,
+.google-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Form field focus states */
+input:focus {
+    border-color: #4285f4;
+    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.25);
+    outline: none;
 } 

@@ -16,6 +16,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <!-- Add config.js for local development -->
     <script src="config.js"></script>
+    <!-- Add the shared auth.js file -->
+    <script src="auth.js"></script>
 </head>
 <body>
     <nav class="navbar">
@@ -42,10 +44,16 @@
         <section class="auth-section fade-in">
             <form id="signUpForm" class="signup-form">
                 <div class="form-group">
-                    <input type="email" id="signUpEmail" name="email" placeholder="Email" required>
+                    <input type="email" id="signUpEmail" name="email" placeholder="Email" required 
+                           autocomplete="email" 
+                           inputmode="email"
+                           aria-label="Email address">
                 </div>
                 <div class="form-group">
-                    <input type="password" id="signUpPassword" name="password" placeholder="Password" required>
+                    <input type="password" id="signUpPassword" name="password" placeholder="Password" required 
+                           autocomplete="new-password"
+                           minlength="6"
+                           aria-label="Password">
                 </div>
                 <button type="submit" class="cta-button">Sign Up</button>
                 <div class="form-group" style="margin-top: 1rem;">
@@ -72,11 +80,6 @@
                     <a href="signin.html" class="cta-button">Sign In Now</a>
                 </div>
             </div>
-
-            <!-- Add this test button right after your form -->
-            <button id="testGoogleAuth" style="margin-top: 20px; padding: 10px; background: #f1f1f1; border: 1px solid #ddd;">
-                Test Basic Google Auth
-            </button>
         </section>
 
         <footer>
@@ -85,23 +88,19 @@
     </main>
 
     <script>
-        console.log("Script section started");
+        // Remove excessive logging
+        // console.log("Script section started");
         
-        // Check if Firebase SDK is loaded
+        // Check if Firebase SDK is loaded - keep this one as it's useful
         if (typeof firebase === 'undefined') {
             console.error("Firebase SDK is not loaded!");
             alert("Firebase SDK failed to load. Please check your internet connection and try again.");
-        } else {
-            console.log("Firebase SDK is loaded");
         }
         
         // Wait for Firebase to be ready
         document.addEventListener('firebaseReady', function() {
-            console.log("Firebase initialized with config:", {
-                apiKey: window.firebaseConfig.apiKey.substring(0, 4) + "...",
-                authDomain: window.firebaseConfig.authDomain,
-                projectId: window.firebaseConfig.projectId
-            });
+            // Only log essential information
+            console.log("Firebase initialized successfully");
             
             // Set up auth listeners after Firebase is initialized
             setupAuthListeners();
@@ -111,6 +110,12 @@
             // Sign Up Form
             document.getElementById('signUpForm').addEventListener('submit', function(event) {
                 event.preventDefault();
+                
+                // Show loading state
+                const submitButton = this.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<div class="spinner"></div> Creating account...';
+                
                 const email = document.getElementById('signUpEmail').value;
                 const password = document.getElementById('signUpPassword').value;
                 
@@ -120,110 +125,46 @@
                         document.getElementById('successPopup').style.display = 'flex';
                         // Clear the form
                         document.getElementById('signUpForm').reset();
+                        
+                        // Reset button
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Sign Up';
                     })
                     .catch((error) => {
                         console.error("Error creating account:", error);
-                        alert("Error creating account: " + error.message);
+                        
+                        // Show error message
+                        const errorElement = document.createElement('div');
+                        errorElement.className = 'error-message';
+                        errorElement.textContent = error.message;
+                        this.appendChild(errorElement);
+                        
+                        // Reset button
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Sign Up';
                     });
             });
             
-            // SIMPLIFIED Google Sign Up - direct approach
-            document.getElementById('googleSignUp').onclick = function() {
-                console.log("Google sign-up button clicked");
-                
-                // Show loading state
-                this.disabled = true;
-                this.innerHTML = 'Connecting...';
-                
-                // Create a new instance of the Google provider
-                const provider = new firebase.auth.GoogleAuthProvider();
-                
-                // Use signInWithPopup with a timeout
-                setTimeout(() => {
-                    firebase.auth().signInWithPopup(provider)
-                        .then(result => {
-                            console.log("Google sign-in successful:", result.user.email);
-                            
-                            // Check if this is a new user
-                            const isNewUser = result.additionalUserInfo?.isNewUser;
-                            if (isNewUser) {
-                                document.getElementById('successPopup').style.display = 'flex';
-                            } else {
-                                // Get the token and redirect
-                                return result.user.getIdToken(true).then(idToken => {
-                                    localStorage.setItem('authToken', idToken);
-                                    window.location.href = "https://app.infoseccompliance.chat/";
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Google sign-in error:", error);
-                            alert("Error signing in with Google: " + error.message);
-                            
-                            // Reset button
-                            this.disabled = false;
-                            this.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="google-icon">Sign up with Google';
-                        });
-                }, 1000);
-            };
-            
-            // Handle redirect result on page load
-            console.log("Checking for redirect result");
-            firebase.auth().getRedirectResult()
-                .then(result => {
-                    console.log("Got redirect result:", result ? "success" : "no result");
-                    if (result && result.user) {
-                        console.log("User signed in:", result.user.email);
-                        const isNewUser = result.additionalUserInfo?.isNewUser;
-                        if (isNewUser) {
-                            document.getElementById('successPopup').style.display = 'flex';
-                        } else {
-                            result.user.getIdToken(true).then(idToken => {
-                                localStorage.setItem('authToken', idToken);
-                                window.location.href = "https://app.infoseccompliance.chat/";
-                            });
-                        }
+            // Google Sign Up - use the shared function
+            document.getElementById('googleSignUp').addEventListener('click', function() {
+                window.signInWithGoogle(
+                    // Success callback
+                    function(idToken) {
+                        // Show success popup for new users
+                        document.getElementById('successPopup').style.display = 'flex';
+                    },
+                    // Error callback
+                    function(error) {
+                        alert("Error signing up with Google: " + error.message);
                     }
-                })
-                .catch(error => {
-                    console.error("Error with redirect result:", error);
-                });
+                );
+            });
             
             // Close success popup
             document.querySelector('.close-button').addEventListener('click', function() {
                 document.getElementById('successPopup').style.display = 'none';
             });
-
-            // Add this at the end of your setupAuthListeners function
-            document.getElementById('testGoogleAuth').onclick = function() {
-                console.log("Test button clicked");
-                alert("Testing Google Auth - check console for logs");
-                
-                const provider = new firebase.auth.GoogleAuthProvider();
-                firebase.auth().signInWithPopup(provider)
-                    .then(result => {
-                        console.log("TEST AUTH SUCCESS:", result.user.email);
-                        alert("Success! Signed in as: " + result.user.email);
-                    })
-                    .catch(error => {
-                        console.error("TEST AUTH ERROR:", error);
-                        alert("Error: " + error.message);
-                    });
-            };
         }
-
-        // Add this at the beginning of your script section
-        const originalFetch = window.fetch;
-        window.fetch = function() {
-            console.log("Fetch request:", arguments[0]);
-            return originalFetch.apply(this, arguments);
-        };
-
-        const originalXHROpen = XMLHttpRequest.prototype.open;
-        XMLHttpRequest.prototype.open = function() {
-            console.log("XHR request:", arguments[1]);
-            return originalXHROpen.apply(this, arguments);
-        };
 
         // Add this to your script section
         document.addEventListener('firebaseConfigError', function(event) {

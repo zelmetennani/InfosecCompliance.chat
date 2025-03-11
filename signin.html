@@ -14,8 +14,10 @@
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
-    <!-- Add config.js for local development -->
+    <!-- Add config.js for Firebase configuration -->
     <script src="config.js"></script>
+    <!-- Add shared auth.js file -->
+    <script src="auth.js"></script>
 </head>
 <body>
     <nav class="navbar">
@@ -42,10 +44,15 @@
         <section class="auth-section fade-in">
             <form id="signInForm" class="signup-form">
                 <div class="form-group">
-                    <input type="email" id="signInEmail" name="email" placeholder="Email" required>
+                    <input type="email" id="signInEmail" name="email" placeholder="Email" required 
+                           autocomplete="email" 
+                           inputmode="email"
+                           aria-label="Email address">
                 </div>
                 <div class="form-group">
-                    <input type="password" id="signInPassword" name="password" placeholder="Password" required>
+                    <input type="password" id="signInPassword" name="password" placeholder="Password" required 
+                           autocomplete="current-password"
+                           aria-label="Password">
                 </div>
                 <button type="submit" class="cta-button">Sign In</button>
                 <div class="form-group" style="margin-top: 1rem;">
@@ -69,26 +76,8 @@
     </main>
 
     <script>
-        // Add this to your script section in signin.html
-        console.log("Script section started");
-
-        // Check if Firebase SDK is loaded
-        if (typeof firebase === 'undefined') {
-            console.error("Firebase SDK is not loaded!");
-            alert("Firebase SDK failed to load. Please check your internet connection and try again.");
-        } else {
-            console.log("Firebase SDK is loaded");
-        }
-
         // Wait for Firebase to be ready
         document.addEventListener('firebaseReady', function() {
-            console.log("Firebase initialized with config:", {
-                apiKey: window.firebaseConfig.apiKey.substring(0, 4) + "...",
-                authDomain: window.firebaseConfig.authDomain,
-                projectId: window.firebaseConfig.projectId
-            });
-            
-            // Set up auth listeners after Firebase is initialized
             setupAuthListeners();
         });
 
@@ -96,6 +85,12 @@
             // Email/Password Sign In
             document.getElementById('signInForm').addEventListener('submit', function(event) {
                 event.preventDefault();
+                
+                // Show loading state
+                const submitButton = this.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<div class="spinner"></div> Signing in...';
+                
                 const email = document.getElementById('signInEmail').value;
                 const password = document.getElementById('signInPassword').value;
                 
@@ -112,60 +107,27 @@
                     })
                     .catch((error) => {
                         console.error("Error signing in:", error);
-                        alert("Error signing in: " + error.message);
+                        
+                        // Show error message
+                        const errorElement = document.createElement('div');
+                        errorElement.className = 'error-message';
+                        errorElement.textContent = error.message;
+                        this.appendChild(errorElement);
+                        
+                        // Reset button
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Sign In';
+                        
                         // Clear the flag if login failed
                         localStorage.removeItem('justLoggedIn');
                     });
             });
 
-            // Google Sign In
+            // Google Sign In - use the shared function
             document.getElementById('googleSignIn').addEventListener('click', function() {
-                const provider = new firebase.auth.GoogleAuthProvider();
-                
-                // Set additional scopes and custom parameters
-                provider.addScope('profile');
-                provider.addScope('email');
-                provider.setCustomParameters({
-                    'prompt': 'select_account'
-                });
-                
-                // Set a flag in localStorage to indicate we just logged in
-                localStorage.setItem('justLoggedIn', 'true');
-                
-                firebase.auth().signInWithPopup(provider)
-                    .then((result) => {
-                        return result.user.getIdToken(true);
-                    })
-                    .then((idToken) => {
-                        localStorage.setItem('authToken', idToken);
-                        window.location.href = "https://app.infoseccompliance.chat/";
-                    })
-                    .catch((error) => {
-                        console.error("Error with Google sign-in:", error);
-                        alert("Error signing in with Google: " + error.message);
-                        // Clear the flag if login failed
-                        localStorage.removeItem('justLoggedIn');
-                    });
+                window.signInWithGoogle();
             });
         }
-
-        // Add this to your script section in signin.html
-        document.addEventListener('firebaseConfigError', function(event) {
-            console.error("Firebase configuration error:", event.detail.message);
-            
-            // Show a user-friendly error message
-            const authSection = document.querySelector('.auth-section');
-            if (authSection) {
-                authSection.innerHTML = `
-                    <div class="error-container" style="text-align: center; padding: 2rem; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 0.25rem;">
-                        <h3>Authentication Temporarily Unavailable</h3>
-                        <p>We're experiencing technical difficulties with our authentication service.</p>
-                        <p>Please try again later or contact support if the problem persists.</p>
-                        <p><a href="mailto:support@infoseccompliance.chat" style="color: #721c24; text-decoration: underline;">Contact Support</a></p>
-                    </div>
-                `;
-            }
-        });
     </script>
 </body>
 </html> 
