@@ -1,4 +1,4 @@
-// build.js - Production focused with graceful fallbacks
+// build.js - Production focused with debugging
 const fs = require('fs');
 require('dotenv').config();
 
@@ -15,12 +15,15 @@ const requiredVars = [
   'FIREBASE_APP_ID'
 ];
 
-// Log environment variables status (without revealing values)
+// Log environment variables status (without revealing full values)
 console.log('Environment variables check:');
 let allVarsPresent = true;
 requiredVars.forEach(varName => {
-  const isSet = process.env[varName] ? true : false;
-  console.log(`- ${varName}: ${isSet ? '✓ Set' : '✗ Missing'}`);
+  const value = process.env[varName];
+  const isSet = value ? true : false;
+  // Show first 4 chars of value if it exists (for debugging)
+  const debugValue = value ? value.substring(0, 4) + '...' : 'undefined';
+  console.log(`- ${varName}: ${isSet ? '✓ Set' : '✗ Missing'} (${debugValue})`);
   if (!isSet) allVarsPresent = false;
 });
 
@@ -40,6 +43,12 @@ const safeConfig = {
   appId: JSON.stringify(process.env.FIREBASE_APP_ID || '')
 };
 
+// Log the first few characters of each config value
+console.log('Config values (first few chars):');
+Object.keys(safeConfig).forEach(key => {
+  console.log(`- ${key}: ${safeConfig[key].substring(0, 10)}...`);
+});
+
 // Replace environment variables with proper JSON strings
 let configContent = configTemplate;
 configContent = configContent.replace('process.env.FIREBASE_API_KEY', safeConfig.apiKey);
@@ -51,6 +60,24 @@ configContent = configContent.replace('process.env.FIREBASE_APP_ID', safeConfig.
 
 // Write the processed config.js
 fs.writeFileSync('config.js', configContent);
+
+// Create a debug file to verify the replacements
+fs.writeFileSync('config.debug.js', `
+// This is a debug file to verify environment variable replacements
+// DO NOT COMMIT THIS FILE TO YOUR REPOSITORY
+// It will be automatically generated during build
+
+window.debugConfig = {
+  apiKey: ${safeConfig.apiKey},
+  authDomain: ${safeConfig.authDomain},
+  projectId: ${safeConfig.projectId},
+  storageBucket: ${safeConfig.storageBucket},
+  messagingSenderId: ${safeConfig.messagingSenderId},
+  appId: ${safeConfig.appId}
+};
+
+console.log('Debug config:', window.debugConfig);
+`);
 
 // Create a message for local development
 if (!process.env.NETLIFY) {

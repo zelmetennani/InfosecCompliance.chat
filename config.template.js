@@ -10,6 +10,15 @@
     appId: process.env.FIREBASE_APP_ID
   };
   
+  // Log the raw config for debugging
+  console.log('Raw Firebase config:', {
+    apiKey: typeof window.firebaseConfig.apiKey === 'string' ? 
+      (window.firebaseConfig.apiKey.substring(0, 4) + '...') : 
+      typeof window.firebaseConfig.apiKey,
+    authDomain: window.firebaseConfig.authDomain,
+    projectId: window.firebaseConfig.projectId
+  });
+  
   // Check if config is valid
   const isConfigValid = window.firebaseConfig.apiKey && 
                        window.firebaseConfig.apiKey !== 'undefined' && 
