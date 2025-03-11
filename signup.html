@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Sign up for Infosec Compliance Chat - AI-powered compliance insights">
-    <title>5Sign Up - Infosec Compliance Chat</title>
+    <title>Sign Up - Infosec Compliance Chat</title>
     <link rel="icon" href="/favicon/favicon.ico">
     <link rel="stylesheet" href="styles.css">
     
@@ -224,6 +224,23 @@
             console.log("XHR request:", arguments[1]);
             return originalXHROpen.apply(this, arguments);
         };
+
+        // Add this to your script section
+        document.addEventListener('firebaseConfigError', function(event) {
+            console.error("Firebase configuration error:", event.detail.message);
+            
+            // Show a user-friendly error message
+            const authSection = document.querySelector('.auth-section');
+            if (authSection) {
+                authSection.innerHTML = `
+                    <div class="error-container" style="text-align: center; padding: 2rem; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 0.25rem;">
+                        <h3>Authentication Temporarily Unavailable</h3>
+                        <p>We're experiencing technical difficulties with our authentication service.</p>
+                        <p>Please try again later or contact support if the problem persists.</p>
+                    </div>
+                `;
+            }
+        });
     </script>
 </body>
 </html> 
