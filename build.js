@@ -1,104 +1,94 @@
-// build.js - Production focused with debugging
+// build.js - Using existing Netlify environment variables
 const fs = require('fs');
 require('dotenv').config();
 
-// Read the config.js template
-const configTemplate = fs.readFileSync('config.template.js', 'utf8');
+console.log('Starting build process with existing Netlify environment variables...');
 
-// Check for required environment variables
-const requiredVars = [
-  'FIREBASE_API_KEY',
-  'FIREBASE_AUTH_DOMAIN',
-  'FIREBASE_PROJECT_ID',
-  'FIREBASE_STORAGE_BUCKET',
-  'FIREBASE_MESSAGING_SENDER_ID',
-  'FIREBASE_APP_ID'
-];
+// Check for environment variables - try both formats
+const envVars = {
+  apiKey: process.env.FIREBASE_API_KEY || process.env.apiKey || '',
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN || process.env.authDomain || '',
+  projectId: process.env.FIREBASE_PROJECT_ID || process.env.projectId || '',
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET || process.env.storageBucket || '',
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || process.env.messagingSenderId || '',
+  appId: process.env.FIREBASE_APP_ID || process.env.appId || ''
+};
 
-// Log environment variables status (without revealing full values)
+// Log environment variable status (without revealing full values)
 console.log('Environment variables check:');
-let allVarsPresent = true;
-requiredVars.forEach(varName => {
-  const value = process.env[varName];
-  const isSet = value ? true : false;
+Object.keys(envVars).forEach(key => {
+  const value = envVars[key];
+  const isSet = value && value.length > 0;
   // Show first 4 chars of value if it exists (for debugging)
-  const debugValue = value ? value.substring(0, 4) + '...' : 'undefined';
-  console.log(`- ${varName}: ${isSet ? '✓ Set' : '✗ Missing'} (${debugValue})`);
-  if (!isSet) allVarsPresent = false;
+  const debugValue = isSet ? value.substring(0, 4) + '...' : 'undefined';
+  console.log(`- ${key}: ${isSet ? '✓ Set' : '✗ Missing'} (${debugValue})`);
 });
 
-if (!allVarsPresent) {
-  console.warn('WARNING: Some environment variables are missing.');
-  console.warn('The site will display an error message to users.');
-  console.warn('Please set all required environment variables in Netlify.');
-}
-
-// Create a safer version of the config with proper string escaping
-const safeConfig = {
-  apiKey: JSON.stringify(process.env.FIREBASE_API_KEY || ''),
-  authDomain: JSON.stringify(process.env.FIREBASE_AUTH_DOMAIN || ''),
-  projectId: JSON.stringify(process.env.FIREBASE_PROJECT_ID || ''),
-  storageBucket: JSON.stringify(process.env.FIREBASE_STORAGE_BUCKET || ''),
-  messagingSenderId: JSON.stringify(process.env.FIREBASE_MESSAGING_SENDER_ID || ''),
-  appId: JSON.stringify(process.env.FIREBASE_APP_ID || '')
-};
-
-// Log the first few characters of each config value
-console.log('Config values (first few chars):');
-Object.keys(safeConfig).forEach(key => {
-  console.log(`- ${key}: ${safeConfig[key].substring(0, 10)}...`);
-});
-
-// Replace environment variables with proper JSON strings
-let configContent = configTemplate;
-configContent = configContent.replace('process.env.FIREBASE_API_KEY', safeConfig.apiKey);
-configContent = configContent.replace('process.env.FIREBASE_AUTH_DOMAIN', safeConfig.authDomain);
-configContent = configContent.replace('process.env.FIREBASE_PROJECT_ID', safeConfig.projectId);
-configContent = configContent.replace('process.env.FIREBASE_STORAGE_BUCKET', safeConfig.storageBucket);
-configContent = configContent.replace('process.env.FIREBASE_MESSAGING_SENDER_ID', safeConfig.messagingSenderId);
-configContent = configContent.replace('process.env.FIREBASE_APP_ID', safeConfig.appId);
-
-// Write the processed config.js
-fs.writeFileSync('config.js', configContent);
-
-// Create a debug file to verify the replacements
-fs.writeFileSync('config.debug.js', `
-// This is a debug file to verify environment variable replacements
-// DO NOT COMMIT THIS FILE TO YOUR REPOSITORY
-// It will be automatically generated during build
-
-window.debugConfig = {
-  apiKey: ${safeConfig.apiKey},
-  authDomain: ${safeConfig.authDomain},
-  projectId: ${safeConfig.projectId},
-  storageBucket: ${safeConfig.storageBucket},
-  messagingSenderId: ${safeConfig.messagingSenderId},
-  appId: ${safeConfig.appId}
-};
-
-console.log('Debug config:', window.debugConfig);
-`);
-
-// Create a message for local development
-if (!process.env.NETLIFY) {
-  console.log('Local development environment detected');
-  console.log('For local development, create an env.js file with your Firebase config');
+// Create a direct Firebase config file with the values
+const configContent = `
+// Firebase configuration - Generated during build
+(function() {
+  // Set the Firebase configuration directly
+  window.firebaseConfig = {
+    apiKey: "${envVars.apiKey}",
+    authDomain: "${envVars.authDomain}",
+    projectId: "${envVars.projectId}",
+    storageBucket: "${envVars.storageBucket}",
+    messagingSenderId: "${envVars.messagingSenderId}",
+    appId: "${envVars.appId}"
+  };
   
-  // Create a sample env.js file if it doesn't exist
-  if (!fs.existsSync('env.js.sample') && !fs.existsSync('env.js')) {
-    const sampleEnv = `// Sample Firebase configuration - RENAME to env.js and add your own keys
-export default {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
-`;
-    fs.writeFileSync('env.js.sample', sampleEnv);
-    console.log('Created env.js.sample file - rename to env.js and add your Firebase config');
+  console.log('Firebase config loaded:', {
+    apiKey: window.firebaseConfig.apiKey ? window.firebaseConfig.apiKey.substring(0, 4) + '...' : 'missing',
+    authDomain: window.firebaseConfig.authDomain || 'missing',
+    projectId: window.firebaseConfig.projectId || 'missing'
+  });
+  
+  // Check if config is valid
+  const isConfigValid = window.firebaseConfig.apiKey && 
+                       window.firebaseConfig.apiKey !== 'undefined' && 
+                       window.firebaseConfig.apiKey !== '';
+  
+  if (!isConfigValid) {
+    console.error("Firebase configuration is invalid or missing API key");
+    document.dispatchEvent(new CustomEvent('firebaseConfigError', { 
+      detail: { message: "Invalid Firebase configuration" } 
+    }));
+    return;
   }
+  
+  // Initialize Firebase when the DOM is ready
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof firebase !== 'undefined') {
+      try {
+        // Initialize Firebase
+        firebase.initializeApp(window.firebaseConfig);
+        console.log("Firebase initialized successfully");
+        document.dispatchEvent(new Event('firebaseReady'));
+      } catch (error) {
+        console.error("Error initializing Firebase:", error);
+        document.dispatchEvent(new CustomEvent('firebaseConfigError', { 
+          detail: { message: error.message } 
+        }));
+      }
+    } else {
+      console.error("Firebase SDK not available");
+      document.dispatchEvent(new CustomEvent('firebaseConfigError', { 
+        detail: { message: "Firebase SDK not loaded" } 
+      }));
+    }
+  });
+})();
+`;
+
+// Write the config file
+fs.writeFileSync('config.js', configContent);
+console.log('Generated config.js file with environment variables');
+
+// Create a _redirects file for Netlify if it doesn't exist
+if (!fs.existsSync('_redirects')) {
+  fs.writeFileSync('_redirects', '/*  /index.html  200');
+  console.log('Created _redirects file for Netlify');
 }
 
 console.log('Build completed successfully!');

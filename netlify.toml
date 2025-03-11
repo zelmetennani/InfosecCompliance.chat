@@ -5,6 +5,8 @@
 [build.environment]
   NODE_VERSION = "16"
 
+# No need to redefine environment variables here if they're already set in Netlify UI
+
 [dev]
   command = "npm run dev"
   port = 8888
