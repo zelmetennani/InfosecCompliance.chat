@@ -17,6 +17,8 @@
   
   if (!isConfigValid) {
     console.error("Firebase configuration is invalid or missing API key");
+    
+    // If we get here, we couldn't initialize Firebase
     document.dispatchEvent(new CustomEvent('firebaseConfigError', { 
       detail: { message: "Invalid Firebase configuration" } 
     }));

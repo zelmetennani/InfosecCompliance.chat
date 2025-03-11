@@ -1,4 +1,4 @@
-// build.js - Production focused
+// build.js - Production focused with graceful fallbacks
 const fs = require('fs');
 require('dotenv').config();
 
@@ -15,16 +15,19 @@ const requiredVars = [
   'FIREBASE_APP_ID'
 ];
 
-// Verify all required variables are present
-const missingVars = requiredVars.filter(varName => !process.env[varName]);
-if (missingVars.length > 0) {
-  console.error('ERROR: Missing required environment variables:');
-  missingVars.forEach(varName => console.error(`- ${varName}`));
-  
-  if (process.env.NETLIFY) {
-    // In Netlify, fail the build if variables are missing
-    process.exit(1);
-  }
+// Log environment variables status (without revealing values)
+console.log('Environment variables check:');
+let allVarsPresent = true;
+requiredVars.forEach(varName => {
+  const isSet = process.env[varName] ? true : false;
+  console.log(`- ${varName}: ${isSet ? '✓ Set' : '✗ Missing'}`);
+  if (!isSet) allVarsPresent = false;
+});
+
+if (!allVarsPresent) {
+  console.warn('WARNING: Some environment variables are missing.');
+  console.warn('The site will display an error message to users.');
+  console.warn('Please set all required environment variables in Netlify.');
 }
 
 // Create a safer version of the config with proper string escaping
