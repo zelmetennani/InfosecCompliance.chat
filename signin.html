@@ -69,21 +69,29 @@
     </main>
 
     <script>
-        // Wait for Firebase config to be ready
-        document.addEventListener('firebaseConfigReady', function() {
-            // Initialize Firebase with the config from config.js
-            firebase.initializeApp(window.firebaseConfig);
-            
+        // Add this to your script section in signin.html
+        console.log("Script section started");
+
+        // Check if Firebase SDK is loaded
+        if (typeof firebase === 'undefined') {
+            console.error("Firebase SDK is not loaded!");
+            alert("Firebase SDK failed to load. Please check your internet connection and try again.");
+        } else {
+            console.log("Firebase SDK is loaded");
+        }
+
+        // Wait for Firebase to be ready
+        document.addEventListener('firebaseReady', function() {
             console.log("Firebase initialized with config:", {
                 apiKey: window.firebaseConfig.apiKey.substring(0, 4) + "...",
                 authDomain: window.firebaseConfig.authDomain,
                 projectId: window.firebaseConfig.projectId
             });
             
-            // Rest of your Firebase code...
+            // Set up auth listeners after Firebase is initialized
             setupAuthListeners();
         });
-        
+
         function setupAuthListeners() {
             // Email/Password Sign In
             document.getElementById('signInForm').addEventListener('submit', function(event) {
@@ -140,6 +148,24 @@
                     });
             });
         }
+
+        // Add this to your script section in signin.html
+        document.addEventListener('firebaseConfigError', function(event) {
+            console.error("Firebase configuration error:", event.detail.message);
+            
+            // Show a user-friendly error message
+            const authSection = document.querySelector('.auth-section');
+            if (authSection) {
+                authSection.innerHTML = `
+                    <div class="error-container" style="text-align: center; padding: 2rem; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 0.25rem;">
+                        <h3>Authentication Temporarily Unavailable</h3>
+                        <p>We're experiencing technical difficulties with our authentication service.</p>
+                        <p>Please try again later or contact support if the problem persists.</p>
+                        <p><a href="mailto:support@infoseccompliance.chat" style="color: #721c24; text-decoration: underline;">Contact Support</a></p>
+                    </div>
+                `;
+            }
+        });
     </script>
 </body>
 </html> 
