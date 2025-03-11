@@ -7,6 +7,8 @@ Thumbs.db
 .env.local
 .env.*.local
 env.js
+# Don't ignore the template file
+!config.template.js
 
 # Editor directories and files
 .idea/
