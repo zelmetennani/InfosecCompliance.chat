@@ -9,11 +9,11 @@
     <link rel="stylesheet" href="styles.css">
     
     <!-- Add proper CSP for Google authentication -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.firebaseio.com https://*.firebase.com https://*.firebaseapp.com https://*.google.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.googleapis.com https://*.gstatic.com https://*.firebaseio.com https://*.firebase.com https://*.firebaseapp.com https://*.google.com; style-src 'self' 'unsafe-inline' https://*.googleapis.com https://*.gstatic.com; connect-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.firebaseio.com https://*.firebase.com https://*.firebaseapp.com https://*.google.com; frame-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.firebaseio.com https://*.firebase.com https://*.firebaseapp.com https://*.google.com;">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';">
     
     <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <!-- Add config.js for local development -->
     <script src="config.js"></script>
 </head>
@@ -72,6 +72,11 @@
                     <a href="signin.html" class="cta-button">Sign In Now</a>
                 </div>
             </div>
+
+            <!-- Add this test button right after your form -->
+            <button id="testGoogleAuth" style="margin-top: 20px; padding: 10px; background: #f1f1f1; border: 1px solid #ddd;">
+                Test Basic Google Auth
+            </button>
         </section>
 
         <footer>
@@ -122,101 +127,99 @@
                     });
             });
             
-            // IMPORTANT: Remove any existing click handlers from the Google button
-            const googleButton = document.getElementById('googleSignUp');
-            const newGoogleButton = googleButton.cloneNode(true);
-            googleButton.parentNode.replaceChild(newGoogleButton, googleButton);
-            
-            // Google Sign Up with popup method
-            newGoogleButton.addEventListener('click', function(event) {
-                console.log("Google sign-up button clicked - ACTUAL HANDLER");
-                event.preventDefault(); // Prevent any default behavior
+            // SIMPLIFIED Google Sign Up - direct approach
+            document.getElementById('googleSignUp').onclick = function(event) {
+                event.preventDefault();
+                console.log("Google sign-up button clicked - SIMPLIFIED HANDLER");
+                
+                // Show visual feedback
+                this.disabled = true;
+                this.innerHTML = '<span>Connecting to Google...</span>';
                 
                 try {
-                    console.log("Creating Google provider...");
+                    // Basic Google provider
                     const provider = new firebase.auth.GoogleAuthProvider();
                     console.log("Google provider created");
                     
-                    // Set additional scopes and custom parameters
-                    provider.addScope('profile');
-                    provider.addScope('email');
-                    provider.setCustomParameters({
-                        'prompt': 'select_account'
-                    });
-                    console.log("Google provider configured with scopes and parameters");
-                    
-                    // Try popup first
-                    console.log("Attempting Google sign-in popup...");
-                    
-                    // Add a delay to ensure the console logs are visible
-                    setTimeout(() => {
-                        firebase.auth().signInWithPopup(provider)
-                            .then((result) => {
-                                console.log("Google sign-in successful", result);
-                                // Check if this is a new user
-                                const isNewUser = result.additionalUserInfo.isNewUser;
-                                console.log("Is new user:", isNewUser);
-                                
-                                if (isNewUser) {
-                                    // Show success popup for new users
-                                    console.log("Showing success popup for new user");
-                                    document.getElementById('successPopup').style.display = 'flex';
-                                } else {
-                                    // Redirect existing users to the app
-                                    console.log("Redirecting existing user to app");
-                                    return result.user.getIdToken(true).then(idToken => {
-                                        localStorage.setItem('authToken', idToken);
-                                        window.location.href = "https://app.infoseccompliance.chat/";
-                                    });
-                                }
-                            })
-                            .catch((error) => {
-                                console.error("Error with Google sign-in popup:", error);
-                                console.error("Error code:", error.code);
-                                console.error("Error message:", error.message);
-                                
-                                // If popup fails, fall back to redirect
-                                console.log("Falling back to redirect method...");
-                                firebase.auth().signInWithRedirect(provider);
-                            });
-                    }, 500);
+                    // Try the redirect method (more reliable)
+                    console.log("Starting Google sign-in with redirect");
+                    firebase.auth().signInWithRedirect(provider)
+                        .then(() => {
+                            console.log("Redirect initiated successfully");
+                        })
+                        .catch(error => {
+                            console.error("Error starting redirect:", error);
+                            alert("Error: " + error.message);
+                            this.disabled = false;
+                            this.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="google-icon">Sign up with Google';
+                        });
                 } catch (error) {
-                    console.error("Exception during Google sign-up setup:", error);
-                    alert("Error setting up Google sign-up: " + error.message);
+                    console.error("Exception in Google sign-up:", error);
+                    alert("Error: " + error.message);
+                    this.disabled = false;
+                    this.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="google-icon">Sign up with Google';
                 }
-            });
+                
+                return false;
+            };
             
-            // Handle the redirect result when the page loads
+            // Handle redirect result on page load
+            console.log("Checking for redirect result");
             firebase.auth().getRedirectResult()
-                .then((result) => {
+                .then(result => {
+                    console.log("Got redirect result:", result ? "success" : "no result");
                     if (result && result.user) {
-                        console.log("Google sign-in redirect successful", result);
-                        const isNewUser = result.additionalUserInfo.isNewUser;
-                        console.log("Is new user:", isNewUser);
-                        
+                        console.log("User signed in:", result.user.email);
+                        const isNewUser = result.additionalUserInfo?.isNewUser;
                         if (isNewUser) {
-                            console.log("Showing success popup for new user");
                             document.getElementById('successPopup').style.display = 'flex';
                         } else {
-                            console.log("Redirecting existing user to app");
-                            return result.user.getIdToken(true).then(idToken => {
+                            result.user.getIdToken(true).then(idToken => {
                                 localStorage.setItem('authToken', idToken);
                                 window.location.href = "https://app.infoseccompliance.chat/";
                             });
                         }
                     }
                 })
-                .catch((error) => {
+                .catch(error => {
                     console.error("Error with redirect result:", error);
-                    console.error("Error code:", error.code);
-                    console.error("Error message:", error.message);
                 });
             
             // Close success popup
             document.querySelector('.close-button').addEventListener('click', function() {
                 document.getElementById('successPopup').style.display = 'none';
             });
+
+            // Add this at the end of your setupAuthListeners function
+            document.getElementById('testGoogleAuth').onclick = function() {
+                console.log("Test button clicked");
+                alert("Testing Google Auth - check console for logs");
+                
+                const provider = new firebase.auth.GoogleAuthProvider();
+                firebase.auth().signInWithPopup(provider)
+                    .then(result => {
+                        console.log("TEST AUTH SUCCESS:", result.user.email);
+                        alert("Success! Signed in as: " + result.user.email);
+                    })
+                    .catch(error => {
+                        console.error("TEST AUTH ERROR:", error);
+                        alert("Error: " + error.message);
+                    });
+            };
         }
+
+        // Add this at the beginning of your script section
+        const originalFetch = window.fetch;
+        window.fetch = function() {
+            console.log("Fetch request:", arguments[0]);
+            return originalFetch.apply(this, arguments);
+        };
+
+        const originalXHROpen = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function() {
+            console.log("XHR request:", arguments[1]);
+            return originalXHROpen.apply(this, arguments);
+        };
     </script>
 </body>
 </html> 
