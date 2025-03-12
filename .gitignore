@@ -3,10 +3,6 @@
 Thumbs.db
 
 # Environment files
-.env
-.env.local
-.env.*.local
-env.js
 config.local.js
 # Don't ignore the template file
 !config.template.js
