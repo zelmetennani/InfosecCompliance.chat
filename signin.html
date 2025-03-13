@@ -102,8 +102,11 @@
                         return userCredential.user.getIdToken(true);
                     })
                     .then((idToken) => {
+                        // Store token in localStorage for the current domain
                         localStorage.setItem('authToken', idToken);
-                        window.location.href = "https://app.infoseccompliance.chat/";
+                        
+                        // Redirect to app domain with token in URL fragment
+                        window.location.href = `https://app.infoseccompliance.chat/#token=${idToken}`;
                     })
                     .catch((error) => {
                         console.error("Error signing in:", error);

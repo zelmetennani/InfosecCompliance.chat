@@ -92,9 +92,18 @@
                 return result.user.getIdToken(true);
             })
             .then((idToken) => {
+                // Store token in localStorage for the current domain
                 localStorage.setItem('authToken', idToken);
-                if (onSuccess) onSuccess(idToken);
-                else window.location.href = "https://app.infoseccompliance.chat/";
+                
+                // Store timestamp for debugging
+                localStorage.setItem('tokenTimestamp', new Date().getTime().toString());
+                
+                if (onSuccess) {
+                    onSuccess(idToken);
+                } else {
+                    // Redirect to app domain with token in URL fragment
+                    window.location.href = `https://app.infoseccompliance.chat/#token=${idToken}`;
+                }
             })
             .catch((error) => {
                 isAuthPopupOpen = false;
