@@ -1,5 +1,8 @@
 // auth.js - Shared authentication functionality
 (function() {
+    // Track if a popup is already open
+    let isAuthPopupOpen = false;
+    
     // Initialize Firebase when ready
     document.addEventListener('DOMContentLoaded', function() {
         // Check if Firebase SDK is loaded
@@ -55,6 +58,12 @@
     
     // Helper function for Google Sign In
     window.signInWithGoogle = function(onSuccess, onError) {
+        // Prevent multiple popups
+        if (isAuthPopupOpen) {
+            console.log("Auth popup already open, ignoring request");
+            return;
+        }
+        
         // Show loading state
         const googleButton = document.querySelector('.google-button');
         if (googleButton) {
@@ -73,9 +82,13 @@
         // Set a flag in localStorage to indicate we just logged in
         localStorage.setItem('justLoggedIn', 'true');
         
+        // Set popup flag
+        isAuthPopupOpen = true;
+        
         // Sign in with popup
         firebase.auth().signInWithPopup(provider)
             .then((result) => {
+                isAuthPopupOpen = false;
                 return result.user.getIdToken(true);
             })
             .then((idToken) => {
@@ -84,9 +97,17 @@
                 else window.location.href = "https://app.infoseccompliance.chat/";
             })
             .catch((error) => {
+                isAuthPopupOpen = false;
                 console.error("Error with Google sign-in:", error);
-                if (onError) onError(error);
-                else alert("Error signing in with Google: " + error.message);
+                
+                // Don't show cancelled popup errors to the user
+                if (error.code !== 'auth/cancelled-popup-request' && 
+                    error.code !== 'auth/popup-closed-by-user') {
+                    if (onError) onError(error);
+                    else alert("Error signing in with Google: " + error.message);
+                } else {
+                    console.log("User cancelled the popup");
+                }
                 
                 // Clear the flag if login failed
                 localStorage.removeItem('justLoggedIn');

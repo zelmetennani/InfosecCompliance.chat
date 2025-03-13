@@ -54,30 +54,10 @@ const configContent = `
     document.dispatchEvent(new CustomEvent('firebaseConfigError', { 
       detail: { message: "Invalid Firebase configuration" } 
     }));
-    return;
   }
   
-  // Initialize Firebase when the DOM is ready
-  document.addEventListener('DOMContentLoaded', function() {
-    if (typeof firebase !== 'undefined') {
-      try {
-        // Initialize Firebase
-        firebase.initializeApp(window.firebaseConfig);
-        console.log("Firebase initialized successfully");
-        document.dispatchEvent(new Event('firebaseReady'));
-      } catch (error) {
-        console.error("Error initializing Firebase:", error);
-        document.dispatchEvent(new CustomEvent('firebaseConfigError', { 
-          detail: { message: error.message } 
-        }));
-      }
-    } else {
-      console.error("Firebase SDK not available");
-      document.dispatchEvent(new CustomEvent('firebaseConfigError', { 
-        detail: { message: "Firebase SDK not loaded" } 
-      }));
-    }
-  });
+  // Note: We don't initialize Firebase here anymore
+  // auth.js will handle the initialization
 })();
 `;
 

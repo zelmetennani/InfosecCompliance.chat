@@ -155,7 +155,11 @@
                     },
                     // Error callback
                     function(error) {
-                        alert("Error signing up with Google: " + error.message);
+                        // Don't show cancelled popup errors to the user
+                        if (error.code !== 'auth/cancelled-popup-request' && 
+                            error.code !== 'auth/popup-closed-by-user') {
+                            alert("Error signing up with Google: " + error.message);
+                        }
                     }
                 );
             });
