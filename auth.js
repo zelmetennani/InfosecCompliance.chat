@@ -79,30 +79,23 @@
             'prompt': 'select_account'
         });
         
-        // Set a flag in localStorage to indicate we just logged in
-        localStorage.setItem('justLoggedIn', 'true');
-        
         // Set popup flag
         isAuthPopupOpen = true;
         
-        // Sign in with popup
-        firebase.auth().signInWithPopup(provider)
+        // Set persistence to SESSION before signing in
+        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+            .then(() => {
+                // Sign in with popup
+                return firebase.auth().signInWithPopup(provider);
+            })
             .then((result) => {
                 isAuthPopupOpen = false;
-                return result.user.getIdToken(true);
-            })
-            .then((idToken) => {
-                // Store token in localStorage for the current domain
-                localStorage.setItem('authToken', idToken);
-                
-                // Store timestamp for debugging
-                localStorage.setItem('tokenTimestamp', new Date().getTime().toString());
                 
                 if (onSuccess) {
-                    onSuccess(idToken);
+                    onSuccess();
                 } else {
-                    // Redirect to app domain with token in URL fragment
-                    window.location.href = `https://app.infoseccompliance.chat/#token=${idToken}`;
+                    // Simply redirect to app without tokens
+                    window.location.href = "https://app.infoseccompliance.chat/";
                 }
             })
             .catch((error) => {
@@ -117,9 +110,6 @@
                 } else {
                     console.log("User cancelled the popup");
                 }
-                
-                // Clear the flag if login failed
-                localStorage.removeItem('justLoggedIn');
                 
                 // Reset button
                 if (googleButton) {

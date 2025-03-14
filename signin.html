@@ -94,19 +94,16 @@
                 const email = document.getElementById('signInEmail').value;
                 const password = document.getElementById('signInPassword').value;
                 
-                // Set a flag in localStorage to indicate we just logged in
-                localStorage.setItem('justLoggedIn', 'true');
-                
-                firebase.auth().signInWithEmailAndPassword(email, password)
-                    .then((userCredential) => {
-                        return userCredential.user.getIdToken(true);
+                // Set persistence to SESSION before signing in
+                firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+                    .then(() => {
+                        // Sign in with email/password
+                        return firebase.auth().signInWithEmailAndPassword(email, password);
                     })
-                    .then((idToken) => {
-                        // Store token in localStorage for the current domain
-                        localStorage.setItem('authToken', idToken);
-                        
-                        // Redirect to app domain with token in URL fragment
-                        window.location.href = `https://app.infoseccompliance.chat/#token=${idToken}`;
+                    .then((userCredential) => {
+                        console.log("Successfully signed in, redirecting to app...");
+                        // Simply redirect to app without tokens
+                        window.location.href = "https://app.infoseccompliance.chat/";
                     })
                     .catch((error) => {
                         console.error("Error signing in:", error);
@@ -120,9 +117,6 @@
                         // Reset button
                         submitButton.disabled = false;
                         submitButton.textContent = 'Sign In';
-                        
-                        // Clear the flag if login failed
-                        localStorage.removeItem('justLoggedIn');
                     });
             });
 
