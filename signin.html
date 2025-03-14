@@ -104,6 +104,9 @@
                     .then((userCredential) => {
                         console.log("Successfully signed in");
                         
+                        // Store the user's UID in localStorage
+                        localStorage.setItem('firebaseUserId', userCredential.user.uid);
+                        
                         // Get the ID token
                         return userCredential.user.getIdToken(true);
                     })
@@ -111,27 +114,20 @@
                         console.log("Got ID token, length:", idToken.length);
                         console.log("Token starts with:", idToken.substring(0, 10) + "...");
                         
-                        // Store token in localStorage for debugging
-                        localStorage.setItem('debugToken', idToken.substring(0, 10) + "...");
-                        
-                        // Try a different approach - pass the token in sessionStorage
+                        // Store token in localStorage and sessionStorage
                         try {
-                            // First try sessionStorage (more secure)
                             sessionStorage.setItem('firebaseAuthToken', idToken);
-                            console.log("Token stored in sessionStorage");
-                            
-                            // Also try localStorage as fallback
                             localStorage.setItem('firebaseAuthToken', idToken);
-                            console.log("Token also stored in localStorage as fallback");
-                            
-                            // Redirect to app with token in URL fragment
-                            console.log("Redirecting to app with token in URL");
-                            window.location.href = `https://app.infoseccompliance.chat/#token=${idToken}`;
+                            console.log("Token stored in storage");
                         } catch (e) {
                             console.error("Error storing token:", e);
-                            // Still try to redirect with token in URL
-                            window.location.href = `https://app.infoseccompliance.chat/#token=${idToken}`;
                         }
+                        
+                        // Encode the token for URL safety
+                        const encodedToken = encodeURIComponent(idToken);
+                        
+                        // Redirect with the token in the URL hash
+                        window.location.href = `https://app.infoseccompliance.chat/#token=${encodedToken}`;
                     })
                     .catch((error) => {
                         console.error("Error signing in:", error);
