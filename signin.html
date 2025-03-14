@@ -104,6 +104,9 @@
                     .then((userCredential) => {
                         console.log("Successfully signed in, redirecting to app...");
                         
+                        // Store a flag to indicate we're coming from a successful sign-in
+                        localStorage.setItem('comingFromSignIn', 'true');
+                        
                         // Force a delay to ensure Firebase has time to persist the auth state
                         setTimeout(() => {
                             window.location.href = "https://app.infoseccompliance.chat/";
