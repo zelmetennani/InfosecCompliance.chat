@@ -82,8 +82,8 @@
         // Set popup flag
         isAuthPopupOpen = true;
         
-        // Set persistence to SESSION before signing in
-        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+        // Set persistence to LOCAL before signing in
+        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             .then(() => {
                 // Sign in with popup
                 return firebase.auth().signInWithPopup(provider);
@@ -94,8 +94,10 @@
                 if (onSuccess) {
                     onSuccess();
                 } else {
-                    // Simply redirect to app without tokens
-                    window.location.href = "https://app.infoseccompliance.chat/";
+                    // Add a delay before redirecting
+                    setTimeout(() => {
+                        window.location.href = "https://app.infoseccompliance.chat/";
+                    }, 1000);
                 }
             })
             .catch((error) => {
