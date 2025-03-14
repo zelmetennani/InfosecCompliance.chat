@@ -94,25 +94,21 @@
                 const email = document.getElementById('signInEmail').value;
                 const password = document.getElementById('signInPassword').value;
                 
-                // Set persistence to LOCAL for better cross-domain support
-                firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+                // Set persistence to SESSION for consistency with app domain
+                firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
                     .then(() => {
-                        console.log("Firebase persistence set to LOCAL");
+                        console.log("Firebase persistence set to SESSION");
                         // Sign in with email/password
                         return firebase.auth().signInWithEmailAndPassword(email, password);
                     })
                     .then((userCredential) => {
                         console.log("Successfully signed in");
                         
-                        // Get the ID token
-                        return userCredential.user.getIdToken(true);
-                    })
-                    .then((idToken) => {
-                        console.log("Got ID token, redirecting to app with token");
-                        
-                        // Simply redirect with the token in the URL
-                        const encodedToken = encodeURIComponent(idToken);
-                        window.location.href = `https://app.infoseccompliance.chat/#token=${encodedToken}`;
+                        // Add a delay before redirecting to ensure auth state is properly saved
+                        setTimeout(() => {
+                            console.log("Redirecting to app after delay");
+                            window.location.href = "https://app.infoseccompliance.chat/";
+                        }, 1000);
                     })
                     .catch((error) => {
                         console.error("Error signing in:", error);

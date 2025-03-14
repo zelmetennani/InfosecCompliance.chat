@@ -82,20 +82,23 @@
         // Set popup flag
         isAuthPopupOpen = true;
         
-        // Set persistence to LOCAL before signing in
-        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+        // Set persistence to SESSION for consistency with app domain
+        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
             .then(() => {
+                console.log("Firebase persistence set to SESSION for Google sign-in");
                 // Sign in with popup
                 return firebase.auth().signInWithPopup(provider);
             })
             .then((result) => {
                 isAuthPopupOpen = false;
+                console.log("Successfully signed in with Google");
                 
                 if (onSuccess) {
                     onSuccess();
                 } else {
-                    // Add a delay before redirecting
+                    // Add a delay before redirecting to ensure auth state is properly saved
                     setTimeout(() => {
+                        console.log("Redirecting to app after delay");
                         window.location.href = "https://app.infoseccompliance.chat/";
                     }, 1000);
                 }
