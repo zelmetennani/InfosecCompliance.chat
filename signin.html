@@ -94,16 +94,20 @@
                 const email = document.getElementById('signInEmail').value;
                 const password = document.getElementById('signInPassword').value;
                 
-                // Set persistence to SESSION before signing in
-                firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+                // Set persistence to LOCAL for better cross-domain support
+                firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
                     .then(() => {
                         // Sign in with email/password
                         return firebase.auth().signInWithEmailAndPassword(email, password);
                     })
                     .then((userCredential) => {
-                        console.log("Successfully signed in, redirecting to app...");
-                        // Simply redirect to app without tokens
-                        window.location.href = "https://app.infoseccompliance.chat/";
+                        console.log("Successfully signed in");
+                        // Get the ID token
+                        return userCredential.user.getIdToken(true);
+                    })
+                    .then((idToken) => {
+                        // Redirect to auth bridge with token
+                        window.location.href = `https://infoseccompliance.chat/auth-bridge.html?token=${idToken}`;
                     })
                     .catch((error) => {
                         console.error("Error signing in:", error);
