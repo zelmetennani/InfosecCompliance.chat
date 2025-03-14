@@ -104,29 +104,14 @@
                     .then((userCredential) => {
                         console.log("Successfully signed in");
                         
-                        // Store the user's UID in localStorage
-                        localStorage.setItem('firebaseUserId', userCredential.user.uid);
-                        
                         // Get the ID token
                         return userCredential.user.getIdToken(true);
                     })
                     .then((idToken) => {
-                        console.log("Got ID token, length:", idToken.length);
-                        console.log("Token starts with:", idToken.substring(0, 10) + "...");
+                        console.log("Got ID token, redirecting to app with token");
                         
-                        // Store token in localStorage and sessionStorage
-                        try {
-                            sessionStorage.setItem('firebaseAuthToken', idToken);
-                            localStorage.setItem('firebaseAuthToken', idToken);
-                            console.log("Token stored in storage");
-                        } catch (e) {
-                            console.error("Error storing token:", e);
-                        }
-                        
-                        // Encode the token for URL safety
+                        // Simply redirect with the token in the URL
                         const encodedToken = encodeURIComponent(idToken);
-                        
-                        // Redirect with the token in the URL hash
                         window.location.href = `https://app.infoseccompliance.chat/#token=${encodedToken}`;
                     })
                     .catch((error) => {
