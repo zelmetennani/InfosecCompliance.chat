@@ -82,10 +82,10 @@
         // Set popup flag
         isAuthPopupOpen = true;
         
-        // Set persistence to SESSION for consistency with app domain
-        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
+        // Set persistence to LOCAL for better cross-domain support
+        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
             .then(() => {
-                console.log("Firebase persistence set to SESSION for Google sign-in");
+                console.log("Firebase persistence set to LOCAL for Google sign-in");
                 // Sign in with popup
                 return firebase.auth().signInWithPopup(provider);
             })
