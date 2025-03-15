@@ -94,10 +94,10 @@
                 const email = document.getElementById('signInEmail').value;
                 const password = document.getElementById('signInPassword').value;
                 
-                // Set persistence to LOCAL for better cross-domain support
-                firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+                // Set persistence to SESSION for better cross-domain support
+                firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
                     .then(() => {
-                        console.log("Firebase persistence set to LOCAL");
+                        console.log("Firebase persistence set to SESSION");
                         // Sign in with email/password
                         return firebase.auth().signInWithEmailAndPassword(email, password);
                     })

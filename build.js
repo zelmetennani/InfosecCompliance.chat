@@ -28,7 +28,7 @@ const configContent = `
 // Firebase configuration - Generated during build
 window.firebaseConfig = {
   apiKey: "${envVars.apiKey}",
-  authDomain: "${envVars.authDomain}",
+  authDomain: "infoseccompliance-chat.firebaseapp.com", // Use Firebase's auth domain
   projectId: "${envVars.projectId}",
   storageBucket: "${envVars.storageBucket}",
   messagingSenderId: "${envVars.messagingSenderId}",
