@@ -76,8 +76,16 @@
     </main>
 
     <script>
-        // Wait for Firebase to be ready
-        document.addEventListener('firebaseReady', function() {
+        // Add this function to the top of your script section
+        function setupCrossDomainAuth() {
+            // Set a cookie on the .infoseccompliance.chat domain to enable sharing
+            document.cookie = "firebaseAuthEnabled=true; domain=.infoseccompliance.chat; path=/; SameSite=None; Secure";
+            console.log("Set cross-domain cookie for authentication");
+        }
+
+        // Call this function early in the initialization process
+        document.addEventListener('DOMContentLoaded', function() {
+            setupCrossDomainAuth();
             setupAuthListeners();
         });
 
@@ -104,11 +112,20 @@
                     .then((userCredential) => {
                         console.log("Successfully signed in");
                         
+                        // Get the user's ID token
+                        return userCredential.user.getIdToken();
+                    })
+                    .then((idToken) => {
+                        console.log("Got ID token, setting up cross-domain auth");
+                        
+                        // Set a cookie with the ID token
+                        document.cookie = `firebaseIdToken=${idToken}; domain=.infoseccompliance.chat; path=/; SameSite=None; Secure`;
+                        
                         // Add a delay before redirecting to ensure auth state is properly saved
                         setTimeout(() => {
                             console.log("Redirecting to app after delay");
                             window.location.href = "https://app.infoseccompliance.chat/";
-                        }, 1000);
+                        }, 2000); // Increased from 1000ms to 2000ms
                     })
                     .catch((error) => {
                         console.error("Error signing in:", error);
