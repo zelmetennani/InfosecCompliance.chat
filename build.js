@@ -23,18 +23,29 @@ Object.keys(envVars).forEach(key => {
   console.log(`- ${key}: ${isSet ? 'Set ✓' : 'Not set ✗'}`);
 });
 
-// Read the config template
-let configContent = fs.readFileSync('config.template.js', 'utf8');
+// Create a direct config.js file with the values
+const configContent = `
+// Firebase configuration - Generated during build
+window.firebaseConfig = {
+  apiKey: "${envVars.apiKey}",
+  authDomain: "${envVars.authDomain}",
+  projectId: "${envVars.projectId}",
+  storageBucket: "${envVars.storageBucket}",
+  messagingSenderId: "${envVars.messagingSenderId}",
+  appId: "${envVars.appId}",
+  measurementId: "${envVars.measurementId || ''}"
+};
 
-// Replace placeholders with actual values
-configContent = configContent
-  .replace('##FIREBASE_API_KEY##', envVars.apiKey)
-  .replace('##FIREBASE_AUTH_DOMAIN##', envVars.authDomain)
-  .replace('##FIREBASE_PROJECT_ID##', envVars.projectId)
-  .replace('##FIREBASE_STORAGE_BUCKET##', envVars.storageBucket)
-  .replace('##FIREBASE_MESSAGING_SENDER_ID##', envVars.messagingSenderId)
-  .replace('##FIREBASE_APP_ID##', envVars.appId)
-  .replace('##FIREBASE_MEASUREMENT_ID##', envVars.measurementId || '');
+// Function to load Firebase config (for compatibility)
+function loadFirebaseConfig() {
+  console.log("Firebase config already loaded from environment variables");
+  // Dispatch event to notify that Firebase config is ready
+  document.dispatchEvent(new Event('firebaseConfigReady'));
+}
+
+// Load the config
+loadFirebaseConfig();
+`;
 
 // Write the config file
 fs.writeFileSync('config.js', configContent);

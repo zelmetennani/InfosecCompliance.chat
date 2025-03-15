@@ -8,18 +8,14 @@
         // Check if Firebase SDK is loaded
         if (typeof firebase === 'undefined') {
             console.error("Firebase SDK is not loaded!");
-            document.dispatchEvent(new CustomEvent('firebaseConfigError', { 
-                detail: { message: "Firebase SDK not available" } 
-            }));
+            showAuthError("Firebase SDK not available");
             return;
         }
         
         // Check if Firebase config is valid
-        if (!window.firebaseConfig || !window.firebaseConfig.apiKey) {
+        if (!window.firebaseConfig || !window.firebaseConfig.apiKey || window.firebaseConfig.apiKey.includes('##')) {
             console.error("Firebase configuration is missing or invalid");
-            document.dispatchEvent(new CustomEvent('firebaseConfigError', { 
-                detail: { message: "Invalid Firebase configuration" } 
-            }));
+            showAuthError("Invalid Firebase configuration");
             return;
         }
         
@@ -32,11 +28,33 @@
             document.dispatchEvent(new Event('firebaseReady'));
         } catch (error) {
             console.error("Error initializing Firebase:", error);
-            document.dispatchEvent(new CustomEvent('firebaseConfigError', { 
-                detail: { message: error.message } 
-            }));
+            showAuthError(error.message);
         }
     });
+    
+    // Helper function to show auth errors
+    function showAuthError(message) {
+        console.error("Authentication error:", message);
+        
+        // Show a user-friendly error message
+        const authSection = document.querySelector('.auth-section');
+        if (authSection) {
+            authSection.innerHTML = `
+                <div class="error-container" style="text-align: center; padding: 2rem; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 0.25rem;">
+                    <h3>Authentication Temporarily Unavailable</h3>
+                    <p>We're experiencing technical difficulties with our authentication service.</p>
+                    <p>Error details: ${message}</p>
+                    <p>Please try again later or contact support if the problem persists.</p>
+                    <p><a href="mailto:support@infoseccompliance.chat" style="color: #721c24; text-decoration: underline;">Contact Support</a></p>
+                </div>
+            `;
+        }
+        
+        // Dispatch event for other components to react
+        document.dispatchEvent(new CustomEvent('firebaseConfigError', { 
+            detail: { message: message } 
+        }));
+    }
     
     // Common error handler for Firebase configuration issues
     document.addEventListener('firebaseConfigError', function(event) {
