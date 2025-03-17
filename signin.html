@@ -121,11 +121,9 @@
                         // Set a cookie with the ID token
                         document.cookie = `firebaseIdToken=${idToken}; domain=.infoseccompliance.chat; path=/; SameSite=None; Secure`;
                         
-                        // Add a delay before redirecting to ensure auth state is properly saved
-                        setTimeout(() => {
-                            console.log("Redirecting to app after delay");
-                            window.location.href = "https://app.infoseccompliance.chat/";
-                        }, 2000); // Increased from 1000ms to 2000ms
+                        // Remove the delay and redirect immediately
+                        console.log("Redirecting to app immediately");
+                        window.location.href = "https://app.infoseccompliance.chat/";
                     })
                     .catch((error) => {
                         console.error("Error signing in:", error);
