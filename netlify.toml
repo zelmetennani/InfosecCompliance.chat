@@ -6,10 +6,6 @@
 [build.environment]
   NODE_VERSION = "16"
 
-# Add this plugin to install function dependencies
-[[plugins]]
-package = "@netlify/plugin-functions-install-core"
-
 # No need to redefine environment variables here if they're already set in Netlify UI
 
 [dev]
