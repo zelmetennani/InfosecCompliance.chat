@@ -1,0 +1,9 @@
+{
+  "name": "netlify-firebase-auth",
+  "version": "1.0.0",
+  "description": "Secure Firebase authentication via Netlify Functions",
+  "main": "firebase-auth.js",
+  "dependencies": {
+    "firebase-admin": "^11.8.0"
+  }
+} 

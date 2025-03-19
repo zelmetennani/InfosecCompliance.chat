@@ -7,6 +7,7 @@
     <title>Sign Up - Infosec Compliance Chat</title>
     <link rel="icon" href="/favicon/favicon.ico">
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Add proper CSP for Google authentication -->
     <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: blob:; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';">
@@ -42,43 +43,43 @@
         </header>
 
         <section class="auth-section fade-in">
-            <form id="signUpForm" class="signup-form">
-                <div class="form-group">
-                    <input type="email" id="signUpEmail" name="email" placeholder="Email" required 
-                           autocomplete="email" 
-                           inputmode="email"
-                           aria-label="Email address">
+            <h1>Create Your Account</h1>
+            <p class="subtitle">Get started with Infosec Compliance Chat</p>
+            
+            <div class="auth-buttons">
+                <button id="googleSignIn" class="google-button">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="google-icon">
+                    Sign up with Google
+                </button>
+                
+                <div class="separator">
+                    <span>or sign up with email</span>
                 </div>
-                <div class="form-group">
-                    <input type="password" id="signUpPassword" name="password" placeholder="Password" required 
-                           autocomplete="new-password"
-                           minlength="6"
-                           aria-label="Password">
-                </div>
-                <button type="submit" class="cta-button">Sign Up</button>
-                <div class="form-group" style="margin-top: 1rem;">
-                    <div class="separator">
-                        <span>or</span>
+                
+                <form id="signupForm" class="signup-form">
+                    <div class="form-group">
+                        <input type="email" id="email" placeholder="Email address" required>
                     </div>
-                    <button type="button" id="googleSignUp" class="google-button">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="google-icon">
-                        Sign up with Google
+                    
+                    <div class="form-group">
+                        <div class="password-container">
+                            <input type="password" id="password" class="password-input" placeholder="Password" required>
+                            <button type="button" id="togglePassword" class="toggle-password">Show</button>
+                        </div>
+                        <p class="help-text">Password must be at least 8 characters</p>
+                    </div>
+                    
+                    <button type="submit" id="signupButton" class="cta-button auth-button">
+                        <span class="spinner auth-loading"></span>
+                        Create Account
                     </button>
-                </div>
+                    
+                    <div class="error-message auth-error"></div>
+                </form>
+                
                 <p class="form-footer">
                     Already have an account? <a href="signin.html">Sign in</a>
                 </p>
-            </form>
-
-            <!-- Success notification popup -->
-            <div id="successPopup" class="notification-popup">
-                <div class="notification-content">
-                    <span class="close-button">&times;</span>
-                    <div class="success-icon">✓</div>
-                    <h3>Account Created!</h3>
-                    <p>Your account has been successfully created.</p>
-                    <a href="signin.html" class="cta-button">Sign In Now</a>
-                </div>
             </div>
         </section>
 
@@ -108,65 +109,32 @@
         
         function setupAuthListeners() {
             // Sign Up Form
-            document.getElementById('signUpForm').addEventListener('submit', function(event) {
-                event.preventDefault();
+            document.getElementById('signupForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
                 
-                // Show loading state
-                const submitButton = this.querySelector('button[type="submit"]');
-                submitButton.disabled = true;
-                submitButton.innerHTML = '<div class="spinner"></div> Creating account...';
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
                 
-                const email = document.getElementById('signUpEmail').value;
-                const password = document.getElementById('signUpPassword').value;
+                const success = await window.auth.signUp(email, password);
                 
-                firebase.auth().createUserWithEmailAndPassword(email, password)
-                    .then((userCredential) => {
-                        // Show success popup
-                        document.getElementById('successPopup').style.display = 'flex';
-                        // Clear the form
-                        document.getElementById('signUpForm').reset();
-                        
-                        // Reset button
-                        submitButton.disabled = false;
-                        submitButton.textContent = 'Sign Up';
-                    })
-                    .catch((error) => {
-                        console.error("Error creating account:", error);
-                        
-                        // Show error message
-                        const errorElement = document.createElement('div');
-                        errorElement.className = 'error-message';
-                        errorElement.textContent = error.message;
-                        this.appendChild(errorElement);
-                        
-                        // Reset button
-                        submitButton.disabled = false;
-                        submitButton.textContent = 'Sign Up';
-                    });
+                if (success) {
+                    window.location.href = '/dashboard.html';
+                }
             });
             
             // Google Sign Up - use the shared function
-            document.getElementById('googleSignUp').addEventListener('click', function() {
-                window.signInWithGoogle(
-                    // Success callback
-                    function(idToken) {
-                        // Show success popup for new users
-                        document.getElementById('successPopup').style.display = 'flex';
-                    },
-                    // Error callback
-                    function(error) {
-                        // Don't show cancelled popup errors to the user
-                        if (error.code !== 'auth/cancelled-popup-request' && 
-                            error.code !== 'auth/popup-closed-by-user') {
-                            alert("Error signing up with Google: " + error.message);
-                        }
-                    }
-                );
+            document.getElementById('googleSignIn').addEventListener('click', function() {
+                alert('Google Sign-in is not implemented in this demo');
+                // In a real implementation, you would call a function to handle Google sign-in
             });
             
-            // Close success popup
-            document.querySelector('.close-button').addEventListener('click', function() {
-                document.getElementById('successPopup').style.display = 'none';
+            // Toggle password visibility
+            const togglePassword = document.getElementById('togglePassword');
+            const passwordInput = document.getElementById('password');
+            togglePassword.addEventListener('click', function() {
+                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                passwordInput.setAttribute('type', type);
+                this.textContent = type === 'password' ? 'Show' : 'Hide';
             });
         }
 

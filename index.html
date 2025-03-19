@@ -268,20 +268,5 @@
             </div>
         </footer>
     </main>
-
-    <script src="config.js"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.3.1/firebase-analytics.js";
-
-        let app, analytics;
-        
-        // Initialize Firebase when config is ready
-        document.addEventListener('firebaseConfigReady', function() {
-            console.log("Initializing Firebase with config:", window.firebaseConfig);
-            app = initializeApp(window.firebaseConfig);
-            analytics = getAnalytics(app);
-        });
-    </script>
 </body>
 </html> 
