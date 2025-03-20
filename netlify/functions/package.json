@@ -4,7 +4,6 @@
   "description": "Secure Firebase authentication via Netlify Functions",
   "main": "firebase-auth.js",
   "dependencies": {
-    "firebase-admin": "^11.8.0",
-    "firebase": "^9.22.0"
+    "firebase-admin": "^11.8.0"
   }
 } 
