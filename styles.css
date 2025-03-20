@@ -1680,9 +1680,9 @@ input:focus {
         border-bottom: none;
     }
     
-    /* Add icons to menu items */
+    /* Add icons to menu items with explicit classes */
     .nav-links .nav-link::before {
-        font-family: "Font Awesome 6 Free", FontAwesome;
+        font-family: "Font Awesome 6 Free";
         font-weight: 900;
         margin-right: 0.75rem;
         font-size: 0.85rem;
@@ -1692,29 +1692,32 @@ input:focus {
         display: inline-block;
     }
     
-    /* Fallback icons using Unicode characters */
-    .nav-links .nav-link:nth-child(1)::before {
-        content: "\f02d"; /* Resources icon - book */
+    .nav-links .nav-resources::before {
+        content: "\f02d"; /* Book icon */
     }
     
-    .nav-links .nav-link:nth-child(2)::before {
-        content: "\f007"; /* About Us icon - user */
+    .nav-links .nav-about::before {
+        content: "\f007"; /* User icon */
     }
     
-    .nav-links .nav-link:nth-child(3)::before {
-        content: "\f3d1"; /* Pricing icon - money-bill-wave */
+    .nav-links .nav-pricing::before {
+        content: "\f3d1"; /* Money bill wave icon */
     }
     
-    .nav-links .nav-link:nth-child(4)::before {
-        content: "\f0e0"; /* Contact icon - envelope */
+    .nav-links .nav-contact::before {
+        content: "\f0e0"; /* Envelope icon */
     }
     
-    .nav-links .nav-link:nth-child(5)::before {
-        content: "\f2f6"; /* Sign In icon - sign-in-alt */
+    .nav-links .nav-signin::before {
+        content: "\f2f6"; /* Sign in icon */
     }
     
     .nav-links .cta-button-small::before {
-        content: "\f234"; /* user-plus icon */
+        content: "\f234"; /* User plus icon */
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        margin-right: 0.75rem;
+        font-size: 0.85rem;
     }
     
     /* Menu header */
