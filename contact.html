@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Contact our support team for help with Infosec Compliance Chat">
+    <meta property="og:title" content="Contact Us - Infosec Compliance Chat">
+    <meta property="og:description" content="Get in touch with our team for support, feedback, or partnership inquiries.">
+    <meta property="og:type" content="website">
+    <title>Contact Us - Infosec Compliance Chat</title>
+    <link rel="icon" href="/favicon/favicon.ico">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-content">
+            <a href="index.html" class="logo-link">
+                <div class="logo">
+                    <img src="/favicon/favicon.ico" alt="Logo" class="logo-icon">
+                    <span class="logo-text">Infosec Compliance Chat</span>
+                </div>
+            </a>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="nav-links">
+                <div class="mobile-menu-header">Menu</div>
+                <a href="resources.html" class="nav-link nav-resources">Resources</a>
+                <a href="about-us.html" class="nav-link nav-about">About Us</a>
+                <a href="pricing.html" class="nav-link nav-pricing">Pricing</a>
+                <a href="contact.html" class="nav-link nav-contact">Contact</a>
+                <a href="signin.html" class="nav-link nav-signin">Sign In</a>
+                <a href="signup.html" class="cta-button-small">Sign Up</a>
+            </div>
+        </div>
+        <div class="overlay"></div>
+    </nav>
+
+    <main class="container">
+        <section class="contact-hero fade-in">
+            <h1>Contact Us</h1>
+            <p class="subtitle">We're here to help with any questions about Infosec Compliance Chat</p>
+        </section>
+
+        <section class="contact-section fade-in">
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <h2>Get in Touch</h2>
+                    <p>Have questions about our service, pricing, or need technical support? Our team is ready to assist you.</p>
+                    
+                    <div class="contact-methods">
+                        <div class="contact-method">
+                            <div class="contact-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h3>Email Us</h3>
+                                <p>For general inquiries:</p>
+                                <a href="mailto:info@infoseccompliance.chat">info@infoseccompliance.chat</a>
+                                <p>For technical support:</p>
+                                <a href="mailto:support@infoseccompliance.chat">support@infoseccompliance.chat</a>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-method">
+                            <div class="contact-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h3>Support Hours</h3>
+                                <p>Monday - Friday: 9am - 5pm EST</p>
+                                <p>We typically respond to all inquiries within 24 business hours.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="contact-method">
+                            <div class="contact-icon">
+                                <i class="fas fa-comments"></i>
+                            </div>
+                            <div class="contact-details">
+                                <h3>Live Chat</h3>
+                                <p>Available for Premium and Enterprise customers.</p>
+                                <a href="#" class="chat-link">Start a chat <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="faq-preview">
+                        <h3>Frequently Asked Questions</h3>
+                        <div class="faq-item">
+                            <h4>How secure is my data with Infosec Compliance Chat?</h4>
+                            <p>We take security seriously. All data is encrypted in transit and at rest, and we never store your compliance conversations. Learn more in our <a href="#">Security Policy</a>.</p>
+                        </div>
+                        <div class="faq-item">
+                            <h4>Can I upgrade or downgrade my plan?</h4>
+                            <p>Yes, you can change your subscription plan at any time. Changes take effect at the start of your next billing cycle.</p>
+                        </div>
+                        <a href="#" class="view-all-faq">View all FAQs <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+                
+                <div class="contact-form-container">
+                    <h2>Send Us a Message</h2>
+                    <p>Fill out the form below and we'll get back to you as soon as possible.</p>
+                    
+                    <!-- Netlify Form -->
+                    <form name="contact" method="POST" data-netlify="true" class="contact-form" netlify-honeypot="bot-field">
+                        <p class="hidden">
+                            <label>Don't fill this out if you're human: <input name="bot-field" /></label>
+                        </p>
+                        <input type="hidden" name="form-name" value="contact" />
+                        
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subject">Subject</label>
+                            <select id="subject" name="subject" required>
+                                <option value="" disabled selected>Select a topic</option>
+                                <option value="general">General Inquiry</option>
+                                <option value="support">Technical Support</option>
+                                <option value="billing">Billing Question</option>
+                                <option value="feedback">Product Feedback</option>
+                                <option value="partnership">Partnership Opportunity</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" name="message" rows="5" required></textarea>
+                        </div>
+                        
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="newsletter" name="newsletter">
+                            <label for="newsletter">Subscribe to our newsletter for compliance tips and product updates</label>
+                        </div>
+                        
+                        <button type="submit" class="cta-button">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-grid">
+                    <div class="footer-column">
+                        <h4>Infosec Compliance Chat</h4>
+                        <p>AI-powered compliance insights and guidance for your organization.</p>
+                        <div class="social-links">
+                            <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                            <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-column">
+                        <h4>Product</h4>
+                        <ul class="footer-links">
+                            <li><a href="index.html">Home</a></li>
+                            <li><a href="pricing.html">Pricing</a></li>
+                            <li><a href="about-us.html">About Us</a></li>
+                            <li><a href="resources.html">Resources</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-column">
+                        <h4>Support</h4>
+                        <ul class="footer-links">
+                            <li><a href="contact.html">Help Center</a></li>
+                            <li><a href="contact.html#contact">Contact Us</a></li>
+                            <li><a href="#">Privacy Policy</a></li>
+                            <li><a href="#">Terms of Service</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="footer-column">
+                        <h4>Newsletter</h4>
+                        <p>Stay updated with compliance news and product updates.</p>
+                        
+                        <form class="newsletter-form">
+                            <div class="form-group">
+                                <input type="email" placeholder="Your email address" required>
+                                <button type="submit" class="cta-button-small">Subscribe</button>
+                            </div>
+                            <p class="disclaimer">By subscribing you agree with our Privacy Policy.</p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <div class="footer-container">
+                    <p>©<script>document.write(new Date().getFullYear());</script> Infosec Compliance Chat</p>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <script>
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.mobile-menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            const overlay = document.querySelector('.overlay');
+            
+            menuToggle.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+                overlay.classList.toggle('active');
+                
+                // Change icon based on menu state
+                const icon = menuToggle.querySelector('i');
+                if (navLinks.classList.contains('active')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+            
+            // Close menu when clicking on overlay
+            overlay.addEventListener('click', function() {
+                navLinks.classList.remove('active');
+                overlay.classList.remove('active');
+                
+                const icon = menuToggle.querySelector('i');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            });
+            
+            // Close menu when clicking on a link
+            const navLinkElements = document.querySelectorAll('.nav-links a');
+            navLinkElements.forEach(link => {
+                link.addEventListener('click', function() {
+                    navLinks.classList.remove('active');
+                    overlay.classList.remove('active');
+                    
+                    const icon = menuToggle.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                });
+            });
+        });
+    </script>
+</body>
+</html> 
