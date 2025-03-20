@@ -127,11 +127,9 @@
                 if (onSuccess) {
                     onSuccess(idToken);
                 } else {
-                    // Add a longer delay before redirecting to ensure auth state is properly saved
-                    setTimeout(() => {
-                        console.log("Redirecting to app after delay");
-                        window.location.href = "https://app.infoseccompliance.chat/";
-                    }, 2000); // Increased from 1000ms to 2000ms
+                    // Redirect immediately without delay
+                    console.log("Redirecting to app");
+                    window.location.href = "https://app.infoseccompliance.chat/";
                 }
             })
             .catch((error) => {
