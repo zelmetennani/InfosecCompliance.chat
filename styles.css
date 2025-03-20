@@ -1692,49 +1692,29 @@ input:focus {
         display: inline-block;
     }
     
-    /* Resources icon */
-    .nav-links a[href*="official-links"]::before {
-        content: "\f02d";
+    /* Fallback icons using Unicode characters */
+    .nav-links .nav-link:nth-child(1)::before {
+        content: "\f02d"; /* Resources icon - book */
     }
     
-    /* About Us icon */
-    .nav-links a[href*="about-us"]::before {
-        content: "\f007";
+    .nav-links .nav-link:nth-child(2)::before {
+        content: "\f007"; /* About Us icon - user */
     }
     
-    /* Pricing icon */
-    .nav-links a[href*="pricing"]::before {
-        content: "\f3d1";
+    .nav-links .nav-link:nth-child(3)::before {
+        content: "\f3d1"; /* Pricing icon - money-bill-wave */
     }
     
-    /* Contact icon */
-    .nav-links a[href*="support"]::before {
-        content: "\f0e0";
+    .nav-links .nav-link:nth-child(4)::before {
+        content: "\f0e0"; /* Contact icon - envelope */
     }
     
-    /* Sign In icon */
-    .nav-links a[href*="signin"]::before {
-        content: "\f2f6";
+    .nav-links .nav-link:nth-child(5)::before {
+        content: "\f2f6"; /* Sign In icon - sign-in-alt */
     }
     
-    /* Sign Up icon */
-    .nav-links a[href*="signup"]::before {
-        content: "\f234";
-        font-family: "Font Awesome 6 Free", FontAwesome;
-        font-weight: 900;
-        margin-right: 0.5rem;
-        font-size: 0.85rem;
-    }
-    
-    .nav-links .cta-button-small {
-        margin-top: 1rem;
-        width: 100%;
-        text-align: center;
-        border-radius: 4px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        padding: 0.75rem 1rem;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    .nav-links .cta-button-small::before {
+        content: "\f234"; /* user-plus icon */
     }
     
     /* Menu header */
