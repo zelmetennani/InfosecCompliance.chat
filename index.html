@@ -99,6 +99,11 @@
             z-index: 1000;
         }
         
+        /* Hide mobile menu header by default */
+        .mobile-menu-header {
+            display: none;
+        }
+        
         @media (max-width: 768px) {
             .mobile-menu-toggle {
                 display: block;
@@ -212,6 +217,7 @@
             
             /* Menu header */
             .mobile-menu-header {
+                display: block;
                 position: absolute;
                 top: 0;
                 left: 0;
