@@ -11,6 +11,7 @@
     <link rel="icon" href="/favicon/favicon.ico">
     
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* Override container width for better content display */
         .container {
@@ -26,6 +27,46 @@
             text-align: center;
         }
         
+        /* Logo styles */
+        .logo {
+            display: flex;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 0;
+        }
+        
+        .logo-text {
+            display: none;
+        }
+        
+        .logo:hover {
+            transform: scale(1.05);
+        }
+        
+        .logo-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+        
+        .logo-link {
+            position: relative;
+        }
+        
+        .logo-link:hover::after {
+            width: 100%;
+        }
+        
         /* Enhanced hero CTA */
         .hero-cta {
             margin-top: 2.5rem;
@@ -37,12 +78,170 @@
             font-weight: 500;
             border-radius: 6px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.3s ease;
+            display: inline-block;
         }
         
         .hero-cta .cta-button-small:hover {
-            transform: translateY(-8px);
+            transform: translateY(-10px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Mobile menu styles */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            cursor: pointer;
+            padding: 0.5rem;
+            z-index: 1000;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-toggle {
+                display: block;
+                position: absolute;
+                right: 1.5rem;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+            
+            .nav-content {
+                position: relative;
+                display: flex;
+                align-items: center;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 250px;
+                height: 100vh;
+                background-color: white;
+                flex-direction: column;
+                padding: 5rem 2rem 2rem;
+                transition: right 0.3s ease;
+                box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+                z-index: 999;
+                display: flex;
+                align-items: flex-start;
+                justify-content: flex-start;
+                background: linear-gradient(to bottom, #f9f9f9, #ffffff);
+                border-left: 1px solid #eaeaea;
+            }
+            
+            .nav-links.active {
+                right: 0;
+            }
+            
+            .nav-links .nav-link {
+                margin: 0.25rem 0;
+                padding: 0.6rem 0;
+                width: 100%;
+                text-align: left;
+                font-size: 0.95rem;
+                font-weight: 500;
+                color: #333;
+                border-bottom: 1px solid #f0f0f0;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+            }
+            
+            .nav-links .nav-link:hover {
+                color: var(--primary-color);
+                padding-left: 0.5rem;
+            }
+            
+            .nav-links .nav-link:last-of-type {
+                border-bottom: none;
+            }
+            
+            /* Add icons to menu items */
+            .nav-links .nav-link::before {
+                font-family: "Font Awesome 6 Free";
+                font-weight: 900;
+                margin-right: 0.75rem;
+                font-size: 0.85rem;
+                opacity: 0.7;
+                width: 20px;
+                text-align: center;
+            }
+            
+            .nav-links .nav-link:nth-child(1)::before {
+                content: "\f02d"; /* Resources icon - book */
+            }
+            
+            .nav-links .nav-link:nth-child(2)::before {
+                content: "\f1e0"; /* Partners icon - share-alt (network) */
+            }
+            
+            .nav-links .nav-link:nth-child(3)::before {
+                content: "\f3d1"; /* Pricing icon - money-bill-wave */
+            }
+            
+            .nav-links .nav-link:nth-child(4)::before {
+                content: "\f0e0"; /* Contact icon - envelope */
+            }
+            
+            .nav-links .nav-link:nth-child(5)::before {
+                content: "\f2f6"; /* Sign In icon - sign-in-alt */
+            }
+            
+            .nav-links .cta-button-small::before {
+                content: "\f234"; /* user-plus icon */
+                font-family: "Font Awesome 6 Free";
+                font-weight: 900;
+                margin-right: 0.5rem;
+                font-size: 0.85rem;
+            }
+            
+            .nav-links .cta-button-small {
+                margin-top: 1rem;
+                width: 100%;
+                text-align: center;
+                border-radius: 4px;
+                font-size: 0.9rem;
+                font-weight: 600;
+                padding: 0.75rem 1rem;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            }
+            
+            /* Menu header */
+            .mobile-menu-header {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                padding: 1.25rem;
+                border-bottom: 1px solid #eaeaea;
+                font-weight: 600;
+                color: var(--primary-color);
+                font-size: 1.1rem;
+                background-color: #f9f9f9;
+            }
+            
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 998;
+                backdrop-filter: blur(3px);
+                transition: opacity 0.3s ease;
+                opacity: 0;
+            }
+            
+            .overlay.active {
+                display: block;
+                opacity: 1;
+            }
         }
     </style>
 </head>
@@ -52,14 +251,23 @@
             <a href="index.html" class="logo-link">
                 <div class="logo">
                     <img src="/favicon/favicon.ico" alt="Logo" class="logo-icon">
-                    Infosec Compliance Chat
+                    <span class="logo-text">Infosec Compliance Chat</span>
                 </div>
             </a>
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                <i class="fas fa-bars"></i>
+            </button>
             <div class="nav-links">
+                <div class="mobile-menu-header">Menu</div>
+                <a href="official-links.html" class="nav-link">Resources</a>
+                <a href="partners.html" class="nav-link">Partners</a>
+                <a href="pricing.html" class="nav-link">Pricing</a>
+                <a href="support.html" class="nav-link">Contact</a>
                 <a href="signin.html" class="nav-link">Sign In</a>
                 <a href="signup.html" class="cta-button-small">Sign Up</a>
             </div>
         </div>
+        <div class="overlay"></div>
     </nav>
 
     <main class="container">
@@ -314,6 +522,52 @@
             console.log("Initializing Firebase with config:", window.firebaseConfig);
             app = initializeApp(window.firebaseConfig);
             analytics = getAnalytics(app);
+        });
+    </script>
+    <script>
+        // Mobile menu toggle
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.querySelector('.mobile-menu-toggle');
+            const navLinks = document.querySelector('.nav-links');
+            const overlay = document.querySelector('.overlay');
+            
+            menuToggle.addEventListener('click', function() {
+                navLinks.classList.toggle('active');
+                overlay.classList.toggle('active');
+                
+                // Change icon based on menu state
+                const icon = menuToggle.querySelector('i');
+                if (navLinks.classList.contains('active')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+            
+            // Close menu when clicking on overlay
+            overlay.addEventListener('click', function() {
+                navLinks.classList.remove('active');
+                overlay.classList.remove('active');
+                
+                const icon = menuToggle.querySelector('i');
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+            });
+            
+            // Close menu when clicking on a link
+            const navLinkElements = document.querySelectorAll('.nav-links a');
+            navLinkElements.forEach(link => {
+                link.addEventListener('click', function() {
+                    navLinks.classList.remove('active');
+                    overlay.classList.remove('active');
+                    
+                    const icon = menuToggle.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                });
+            });
         });
     </script>
 </body>
