@@ -154,4 +154,15 @@
                 }
             });
     };
+
+    // Add to auth.js
+    window.sendPasswordResetEmail = function(email, onSuccess, onError) {
+        firebase.auth().sendPasswordResetEmail(email)
+            .then(() => {
+                if (onSuccess) onSuccess();
+            })
+            .catch((error) => {
+                if (onError) onError(error);
+            });
+    };
 })(); 
