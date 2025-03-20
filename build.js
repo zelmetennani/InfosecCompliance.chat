@@ -1,60 +1,71 @@
-// build.js - Using existing Netlify environment variables
-const fs = require('fs');
-require('dotenv').config();
+/**
+ * Simplified build script for Netlify deployment
+ * Generates Firebase configuration from environment variables
+ */
 
-console.log('Starting build process with existing Netlify environment variables...');
+const fs = require('fs-extra');
 
-// Check for environment variables
-const envVars = {
-  apiKey: process.env.apiKey || '',
-  authDomain: process.env.authDomain || '',
-  projectId: process.env.projectId || '',
-  storageBucket: process.env.storageBucket || '',
-  messagingSenderId: process.env.messagingSenderId || '',
-  appId: process.env.appId || '',
-  measurementId: process.env.measurementId || ''
-};
+// Required Firebase configuration keys
+const REQUIRED_ENV_VARS = [
+  'apiKey',
+  'authDomain',
+  'projectId',
+  'storageBucket',
+  'messagingSenderId',
+  'appId'
+];
 
-// Log environment variable status (without revealing full values)
-console.log('Environment variables check:');
-Object.keys(envVars).forEach(key => {
-  const value = envVars[key];
-  const isSet = value && value.length > 0;
-  console.log(`- ${key}: ${isSet ? 'Set ✓' : 'Not set ✗'}`);
-});
-
-// Create a direct config.js file with the values
-const configContent = `
-// Firebase configuration - Generated during build
-window.firebaseConfig = {
-  apiKey: "${envVars.apiKey}",
-  authDomain: "infoseccompliance-chat.firebaseapp.com",
-  projectId: "${envVars.projectId}",
-  storageBucket: "${envVars.storageBucket}",
-  messagingSenderId: "${envVars.messagingSenderId}",
-  appId: "${envVars.appId}",
-  measurementId: "${envVars.measurementId || ''}"
-};
-
-// Function to load Firebase config (for compatibility)
-function loadFirebaseConfig() {
-  console.log("Firebase config already loaded from environment variables");
-  // Dispatch event to notify that Firebase config is ready
-  document.dispatchEvent(new Event('firebaseConfigReady'));
+function main() {
+  console.log('Starting build process...');
+  
+  // Validate environment variables
+  const missingVars = validateEnvironmentVariables();
+  if (missingVars.length > 0) {
+    console.error(`ERROR: Missing required environment variables: ${missingVars.join(', ')}`);
+    console.error('Please set these variables in your Netlify dashboard.');
+    process.exit(1);
+  }
+  
+  // Generate Firebase configuration
+  generateFirebaseConfig();
+  
+  console.log('Build completed successfully!');
 }
 
-// Load the config
-loadFirebaseConfig();
+function validateEnvironmentVariables() {
+  const missingVars = [];
+  
+  for (const envVar of REQUIRED_ENV_VARS) {
+    if (!process.env[envVar]) {
+      missingVars.push(envVar);
+    }
+  }
+  
+  return missingVars;
+}
+
+function generateFirebaseConfig() {
+  console.log('Generating Firebase configuration...');
+  
+  // Create Firebase configuration object from environment variables
+  const firebaseConfig = {};
+  for (const envVar of REQUIRED_ENV_VARS) {
+    firebaseConfig[envVar] = process.env[envVar];
+  }
+  
+  // Create config.js file
+  const configContent = `
+// Firebase configuration - Auto-generated during build
+window.firebaseConfig = ${JSON.stringify(firebaseConfig, null, 2)};
+
+// Dispatch event to notify that config is ready
+document.dispatchEvent(new Event('firebaseConfigReady'));
 `;
 
-// Write the config file
-fs.writeFileSync('config.js', configContent);
-console.log('Generated config.js file with environment variables');
-
-// Create _redirects file for Netlify if it doesn't exist
-if (!fs.existsSync('_redirects')) {
-  fs.writeFileSync('_redirects', '/*  /index.html  200');
-  console.log('Created _redirects file for Netlify');
+  // Write config file
+  fs.writeFileSync('config.js', configContent);
+  console.log('Firebase configuration generated successfully.');
 }
 
-console.log('Build completed successfully!');
+// Run the build process
+main();
