@@ -86,6 +86,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             setupCrossDomainAuth();
             setupAuthListeners();
+            
+            // Check for redirect result
+            window.handleGoogleRedirect();
         });
 
         function setupAuthListeners() {
