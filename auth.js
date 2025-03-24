@@ -80,6 +80,12 @@
     
     // Helper function for Google Sign In
     window.signInWithGoogle = function(onSuccess, onError) {
+        // Check if a popup is already open
+        if (isAuthPopupOpen) {
+            console.log("A sign-in popup is already open");
+            return;
+        }
+        
         // Get the button that was clicked (if any)
         const googleButton = document.querySelector('#googleSignIn');
         if (googleButton) {
@@ -95,61 +101,54 @@
             'prompt': 'select_account'
         });
         
+        // Set popup flag
+        isAuthPopupOpen = true;
+        
         // Set persistence to SESSION for better cross-domain support
         firebase.auth().setPersistence(firebase.auth.Auth.Persistence.SESSION)
             .then(() => {
                 console.log("Firebase persistence set to SESSION for Google sign-in");
-                
-                // Use redirect instead of popup for better compatibility
-                return firebase.auth().signInWithRedirect(provider);
+                // Sign in with popup
+                return firebase.auth().signInWithPopup(provider);
             })
-            .catch((error) => {
-                console.error("Error setting up Google sign-in:", error);
-                
-                // Reset button
-                if (googleButton) {
-                    googleButton.disabled = false;
-                    googleButton.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="google-icon">Sign in with Google';
-                }
-                
-                if (onError) onError(error);
-                else alert("Error signing in with Google: " + error.message);
-            });
-    };
-
-    // Add handler for redirect result
-    window.handleGoogleRedirect = function() {
-        firebase.auth().getRedirectResult()
             .then((result) => {
-                if (result.user) {
-                    console.log("Successfully signed in with Google via redirect");
-                    
-                    // Get the user's ID token
-                    return result.user.getIdToken();
-                }
-                return null;
+                isAuthPopupOpen = false;
+                console.log("Successfully signed in with Google");
+                
+                // Get the user's ID token
+                return result.user.getIdToken();
             })
             .then((idToken) => {
-                if (idToken) {
-                    console.log("Got ID token, setting up cross-domain auth");
-                    
-                    // Set a cookie with the ID token
-                    document.cookie = `firebaseIdToken=${idToken}; domain=.infoseccompliance.chat; path=/; SameSite=None; Secure`;
-                    
-                    // Redirect to app
+                console.log("Got ID token, setting up cross-domain auth");
+                
+                // Set a cookie with the ID token
+                document.cookie = `firebaseIdToken=${idToken}; domain=.infoseccompliance.chat; path=/; SameSite=None; Secure`;
+                
+                if (onSuccess) {
+                    onSuccess(idToken);
+                } else {
+                    // Redirect immediately without delay
                     console.log("Redirecting to app");
                     window.location.href = "https://app.infoseccompliance.chat/";
                 }
             })
             .catch((error) => {
-                // Don't show cancelled redirect errors to the user
+                isAuthPopupOpen = false;
+                console.error("Error with Google sign-in:", error);
+                
+                // Don't show cancelled popup errors to the user
                 if (error.code !== 'auth/cancelled-popup-request' && 
-                    error.code !== 'auth/popup-closed-by-user' &&
-                    error.code !== 'auth/user-cancelled') {
-                    console.error("Error with Google sign-in redirect:", error);
-                    alert("Error signing in with Google: " + error.message);
+                    error.code !== 'auth/popup-closed-by-user') {
+                    if (onError) onError(error);
+                    else alert("Error signing in with Google: " + error.message);
                 } else {
-                    console.log("User cancelled the Google sign-in");
+                    console.log("User cancelled the popup");
+                }
+                
+                // Reset button
+                if (googleButton) {
+                    googleButton.disabled = false;
+                    googleButton.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="google-icon">Sign in with Google';
                 }
             });
     };
